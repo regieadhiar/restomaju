@@ -44,10 +44,10 @@ $menuQuery = $data['menuQuery'];
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <div class="lg:col-span-2">
                 <div class="flex space-x-2 mb-6 overflow-x-auto pb-2">
-                    <button onclick="filterMenu('all')" class="cat-btn px-4 py-2 bg-orange-500 text-white rounded-lg"><i class="fas fa-list mr-2"></i>Semua</button>
-                    <button onclick="filterMenu('food')" class="cat-btn px-4 py-2 bg-white border border-slate-200 text-slate-700 rounded-lg"><i class="fas fa-utensils mr-2"></i>Makanan</button>
-                    <button onclick="filterMenu('drink')" class="cat-btn px-4 py-2 bg-white border border-slate-200 text-slate-700 rounded-lg"><i class="fas fa-glass-whiskey mr-2"></i>Minuman</button>
-                    <button onclick="filterMenu('snack')" class="cat-btn px-4 py-2 bg-white border border-slate-200 text-slate-700 rounded-lg"><i class="fas fa-cookie mr-2"></i>Cemilan</button>
+                    <button onclick="filterMenu('all')" data-category="all" class="cat-btn px-4 py-2 bg-orange-500 text-white rounded-lg"><i class="fas fa-list mr-2"></i>Semua</button>
+                    <button onclick="filterMenu('food')" data-category="food" class="cat-btn px-4 py-2 bg-white border border-slate-200 text-slate-700 rounded-lg"><i class="fas fa-utensils mr-2"></i>Makanan</button>
+                    <button onclick="filterMenu('drink')" data-category="drink" class="cat-btn px-4 py-2 bg-white border border-slate-200 text-slate-700 rounded-lg"><i class="fas fa-glass-whiskey mr-2"></i>Minuman</button>
+                    <button onclick="filterMenu('snack')" data-category="snack" class="cat-btn px-4 py-2 bg-white border border-slate-200 text-slate-700 rounded-lg"><i class="fas fa-cookie mr-2"></i>Cemilan</button>
                 </div>
 
                 <div id="menu-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -94,6 +94,19 @@ $menuQuery = $data['menuQuery'];
             document.querySelectorAll('.menu-item').forEach(el => {
                 if(cat === 'all' || el.dataset.category === cat) el.classList.remove('hidden');
                 else el.classList.add('hidden');
+            });
+            setActiveCategory(cat);
+        }
+
+        function setActiveCategory(cat) {
+            document.querySelectorAll('.cat-btn').forEach(btn => {
+                if(btn.dataset.category === cat) {
+                    btn.classList.remove('bg-white', 'border-slate-200', 'text-slate-700');
+                    btn.classList.add('bg-orange-500', 'text-white', 'border-orange-500');
+                } else {
+                    btn.classList.remove('bg-orange-500', 'text-white', 'border-orange-500');
+                    btn.classList.add('bg-white', 'border-slate-200', 'text-slate-700');
+                }
             });
         }
 

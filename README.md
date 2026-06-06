@@ -1,62 +1,92 @@
-# 🍽️ Sistem Pemesanan Restoran (RestoKu)
+# 🍽️ RestoMaju - Sistem Pemesanan Restoran
 
-Aplikasi manajemen dan sistem pemesanan restoran berbasis **PHP Native** dan **MariaDB**. Aplikasi ini menggunakan arsitektur modular berbasis komponen (*component-based UI*) dengan antarmuka modern yang ditenagai oleh **Tailwind CSS**. Sistem ini mendukung multi-role untuk mengintegrasikan seluruh alur operasional restoran secara real-time.
-
----
-
-## 🚀 Fitur Utama & Pembagian Peran (Multi-Role)
-
-Aplikasi ini dibagi menjadi 4 halaman utama dengan hak akses khusus (*Role-Based Access Control*):
-
-1. **Pelayan (Waiter)**
-   - Menampilkan daftar menu makanan dan minuman dinamis berdasarkan kategori (*Tab System*).
-   - Indikator status stok menu (*Tersedia / Habis*).
-   - Fitur keranjang belanja interaktif (*tambah, kurang, hapus item*).
-   - Pengiriman pesanan ke dapur berdasarkan nomor meja dan nama pelanggan.
-
-2. **Dapur (Kitchen Display System)**
-   - Antrean pesanan aktif berstatus `diproses` dengan urutan waktu masuk (*FIFO - First In First Out*).
-   - Fitur *Auto-Refresh* otomatis untuk mendeteksi pesanan baru tanpa muat ulang halaman.
-   - Tombol aksi mengubah status pesanan menjadi `Siap Saji` sekali klik.
-
-3. **Kasir (Billing & Pembayaran)**
-   - Monitor visual status meja (Merah: terisi/belum bayar, Abu-abu: kosong).
-   - Perhitungan total tagihan otomatis per transaksi secara real-time.
-   - Kalkulator pembayaran (input uang tunai dan hitung kembalian).
-   - Fitur konfirmasi pembayaran untuk mengubah status pesanan menjadi `selesai`.
-
-4. **Pemilik / Admin (Owner Panel)**
-   - **Dashboard Analitik:** Grafik menampilkan **5 Menu Paling Laris** berdasarkan agregasi data penjualan.
-   - **Manajemen Menu (Full CRUD):** Tambah (*Create*), Lihat (*Read*), Ubah Harga/Stok (*Update*), dan Hapus (*Delete*) data menu restoran.
-   - Ringkasan statistik cepat pendapatan harian dan total pesanan sukses.
+Aplikasi pemesanan restoran berbasis **PHP Native** dan **MariaDB** dengan antarmuka modern menggunakan **Tailwind CSS**. Sistem dibuat modular, mendukung login multi-role, manajemen menu, alur pesanan real-time, dan pembayaran kasir.
 
 ---
 
-## 📁 Struktur Folder Proyek (Filetree)
+## 🚀 Fitur Utama & Pembagian Peran
 
-Struktur folder dirancang sangat rapi dan modular agar memudahkan kolaborasi tim dan pelacakan riwayat perubahan (*commit*) di GitHub:
+Aplikasi memiliki empat role utama yang diatur dengan hak akses terpisah:
+
+1. **Admin**
+   - Dashboard operasional dengan ringkasan pendapatan harian, jumlah transaksi, menu aktif, dan meja terisi.
+   - Manajemen menu lengkap: tambah, edit, lihat detail, dan hapus menu.
+   - Manajemen meja restoran: tambah meja baru dan hapus meja kosong.
+   - Tab analitik untuk melihat grafik pendapatan, pesanan, kategori penjualan, dan menu terlaris.
+   - Manajemen user internal untuk role dan akses.
+
+2. **Pelayan**
+   - Memilih meja kosong dan memasukkan nama pelanggan.
+   - Menampilkan menu dengan filter kategori: Semua, Makanan, Minuman, Cemilan.
+   - Keranjang pesanan interaktif: tambah item, ubah jumlah, dan lihat total.
+   - Kirim pesanan ke dapur dengan satu klik.
+
+3. **Dapur**
+   - Tampilan antrean pesanan aktif untuk proses masak.
+   - Menampilkan detail meja dan item pesanan.
+   - Tombol untuk menandai pesanan sebagai **Siap Saji**.
+   - Jam digital untuk membantu tracking waktu layanan.
+
+4. **Kasir**
+   - Lihat status meja: kosong, memasak, atau siap bayar.
+   - Pilih meja siap bayar untuk menampilkan struk pesanan.
+   - Hitung subtotal, pajak, diskon, tip, dan total pembayaran.
+   - Input uang tunai dan hitung kembalian otomatis.
+   - Cetak struk atau selesaikan transaksi.
+
+---
+
+## 📁 Struktur Folder Proyek
+
+Berikut struktur file utama dalam repositori:
 
 ```text
-restoran-app/
-├── 📁 actions                # Logika Pemrosesan Backend (Hanya PHP Murni / Tanpa Output HTML)
-│   ├── 🐘 buat-password.php  # Logika Pemrosesan Password jadi Hashed
-│   └── 🐘 proses-login.php   # Logika Proses Login Multi-Role
-├── 📁 assets                 # File statis (Aset Frontend)
-│   ├── 📁 css
-│   │   ├── 🎨 input.css
-│   │   └── 🎨 style.css      # Desain kustom tambahan
-│   └── 📁 js
-│       └── 📄 main.js        # Logika JavaScript (AJAX Auto-Refresh, manajemen keranjang)
-├── 📁 components             # Komponen Reusable PHP (UI Bersifat Parsial)
-│   ├── 🐘 footer.php         # Struktur penutup HTML & inisialisasi core JavaScript
-│   └── 🐘 header.php         # Struktur tag <head>, CDN Tailwind, & Navbar atas
-├── 📁 config                 # Pengaturan sistem & koneksi database
-│   └── 🐘 database.php       # Koneksi ke MariaDB menggunakan PDO (Aman dari SQL Injection)
-├── 📁 pages                  # Halaman Antarmuka Utama berdasarkan Role
-│   ├── 🐘 admin.php          # Panel khusus manajemen dan pemilik restoran
-│   ├── 🐘 dapur.php          # Tampilan layar monitor koki di dapur
-│   ├── 🐘 kasir.php          # Tampilan kasir untuk mengelola pembayaran & meja
-│   ├── 🐘 login.php          # Antarmuka halaman masuk multi-role
-│   └── 🐘 pelayan.php        # Tampilan input pesanan pelanggan
-├── 📝 README.md              # Dokumentasi proyek (File ini)
-├── 🐘 index.php              # Pintu masuk utama aplikasi / Core Router halaman
+resto/
+├── actions/
+│   ├── admin_action.php
+│   ├── auth.php
+│   ├── cashier_action.php
+│   ├── kitchen_action.php
+│   ├── login_action.php
+│   └── waiter_action.php
+├── assets/
+│   └── css/
+│       ├── input.css
+│       └── style.css
+├── components/
+│   ├── alert.php
+│   ├── head.php
+│   ├── login_form.php
+│   └── page_brand.php
+├── config/
+│   └── db.php
+├── database/
+│   └── restoran-v1.sql
+├── pages/
+│   ├── admin.php
+│   ├── cashier.php
+│   ├── kitchen.php
+│   ├── logout.php
+│   └── waiter.php
+├── index.php
+├── login.php
+└── README.md
+```
+
+---
+
+## ⚙️ Teknologi Utama
+
+- PHP Native
+- MariaDB / MySQL
+- Tailwind CSS
+- Session-based role access
+- Struktur modular dengan komponen reusable
+
+---
+
+## 📌 Catatan
+
+- Pastikan `config/db.php` dikonfigurasi sesuai koneksi database di lingkungan lokal.
+- Import `database/restoran-v1.sql` jika tabel database belum tersedia.
+- Jalankan aplikasi menggunakan web server lokal seperti XAMPP, MAMP, atau PHP built-in server.
