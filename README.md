@@ -1,4 +1,4 @@
-# 🍽️ Sistem Pemesanan Restoran (RestoMaju)
+# 🍽️ Sistem Pemesanan Restoran (RestoKu)
 
 Aplikasi manajemen dan sistem pemesanan restoran berbasis **PHP Native** dan **MariaDB**. Aplikasi ini menggunakan arsitektur modular berbasis komponen (*component-based UI*) dengan antarmuka modern yang ditenagai oleh **Tailwind CSS**. Sistem ini mendukung multi-role untuk mengintegrasikan seluruh alur operasional restoran secara real-time.
 

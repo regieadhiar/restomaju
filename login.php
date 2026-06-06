@@ -1,18 +1,6 @@
 <?php
-include './config/db.php';
-include './actions/auth.php';
-
-if (isset($_SESSION['user_id']) && !empty($_SESSION['role'])) {
-    header('Location: pages/' . $_SESSION['role'] . '.php');
-    exit();
-}
-
-$error = '';
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $error = handleLogin($conn, $_POST);
-}
-
-$pageTitle = 'Sistem Pemesanan Restoran - Login';
+header('Location: index.php');
+exit();
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -28,13 +16,8 @@ $pageTitle = 'Sistem Pemesanan Restoran - Login';
         document.getElementById('toggle-password').addEventListener('click', function() {
             const pwd = document.getElementById('password');
             const icon = this.querySelector('i');
-            if (pwd.type === 'password') {
-                pwd.type = 'text';
-                icon.className = 'fas fa-eye-slash text-slate-400';
-            } else {
-                pwd.type = 'password';
-                icon.className = 'fas fa-eye text-slate-400';
-            }
+            if (pwd.type === 'password') { pwd.type = 'text'; icon.className = 'fas fa-eye-slash text-slate-400'; }
+            else { pwd.type = 'password'; icon.className = 'fas fa-eye text-slate-400'; }
         });
     </script>
 </body>
