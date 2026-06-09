@@ -14,10 +14,10 @@ $menuQuery = $data['menuQuery'];
 <body class="bg-slate-50 min-h-screen font-sans">
     <header class="bg-white shadow-sm sticky top-0 z-10 p-4">
         <div class="container mx-auto flex justify-between items-center">
-            <h1 class="text-xl font-bold text-slate-800"><i class="fas fa-concierge-bell mr-2 text-orange-500"></i>Halaman Pelayan</h1>
+            <h1 class="text-xl font-bold text-resto-dark"><i class="fas fa-concierge-bell mr-2 text-resto-primary"></i>Halaman Pelayan</h1>
             <div class="flex items-center space-x-4">
-                <span class="text-sm text-slate-500"><i class="fas fa-user mr-1"></i><?= $_SESSION['username'] ?></span>
-                <a href="logout.php" class="text-red-500 hover:text-red-700 text-sm font-semibold"><i class="fas fa-sign-out-alt"></i></a>
+                <span class="text-sm text-resto-gray"><i class="fas fa-user mr-1"></i><?= $_SESSION['username'] ?></span>
+                <a href="logout.php" class="text-resto-danger hover:text-red-700 text-sm font-semibold"><i class="fas fa-sign-out-alt"></i></a>
             </div>
         </div>
     </header>
@@ -26,8 +26,8 @@ $menuQuery = $data['menuQuery'];
         <div class="bg-white rounded-xl shadow p-6 mb-6">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                    <label class="block text-sm font-medium text-slate-700 mb-2">Nomor Meja</label>
-                    <select id="table-select" class="w-full px-4 py-3 border border-slate-200 rounded-lg outline-none bg-white">
+                    <label class="block text-sm font-medium text-resto-dark mb-2">Nomor Meja</label>
+                    <select id="table-select" class="w-full px-4 py-3 border border-resto-gray/30 rounded-lg outline-none bg-white">
                         <option value="">-- Pilih Meja --</option>
                         <?php foreach($tablesQuery as $t): ?>
                             <option value="<?= $t['id'] ?>" <?= $t['status']!=='empty'?'disabled':'' ?>><?= $t['table_number'] ?> <?= $t['status']!=='empty'?'(Terisi)':'' ?></option>
@@ -35,8 +35,8 @@ $menuQuery = $data['menuQuery'];
                     </select>
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-slate-700 mb-2">Nama Pelanggan</label>
-                    <input type="text" id="customer-name" class="w-full px-4 py-3 border border-slate-200 rounded-lg outline-none" placeholder="Masukkan nama pelanggan">
+                    <label class="block text-sm font-medium text-resto-dark mb-2">Nama Pelanggan</label>
+                    <input type="text" id="customer-name" class="w-full px-4 py-3 border border-resto-gray/30 rounded-lg outline-none" placeholder="Masukkan nama pelanggan">
                 </div>
             </div>
         </div>
@@ -65,22 +65,43 @@ $menuQuery = $data['menuQuery'];
                     <?php endforeach; ?>
                 </div>
             </div>
+            
+            <div class="lg:col-span-1 relative">
+                <div id="mobile-cart-sidebar" class="fixed inset-y-0 right-0 z-40 w-full max-w-sm p-4 transform translate-x-full transition-transform duration-300 md:static md:translate-x-0 md:w-auto md:p-0">
+                    <div class="bg-white rounded-xl shadow-lg sticky top-24">
+                        <div class="p-6">
+                            <div class="flex justify-between items-center mb-6">
+                                <h2 class="text-xl font-bold text-resto-dark">Keranjang Pesanan</h2>
+                                <button id="close-cart-mobile" class="md:hidden text-resto-gray hover:text-resto-dark">
+                                    <i class="fas fa-times text-xl"></i>
+                                </button>
+                            </div>
 
-            <div class="lg:col-span-1">
-                <div class="bg-white rounded-xl shadow-lg p-6 sticky top-24">
-                    <h2 class="text-xl font-bold mb-4 text-slate-800">Keranjang Pesanan</h2>
-                    <div id="cart-items" class="space-y-4 max-h-80 overflow-y-auto mb-6 text-slate-500">
-                        <p class="text-center py-4">Keranjang kosong</p>
-                    </div>
-                    <div class="border-t pt-4">
-                        <div class="flex justify-between text-lg font-semibold mb-4">
-                            <span>Total:</span><span id="cart-total" class="text-orange-500 font-bold">Rp 0</span>
+                            <div id="cart-items" class="space-y-4 max-h-96 overflow-y-auto mb-6 text-resto-gray">
+                                <div class="text-center py-8 text-resto-gray">
+                                    <i class="fas fa-shopping-cart text-4xl mb-3"></i>
+                                    <p>Keranjang kosong</p>
+                                    <p class="text-sm">Tambahkan menu dari katalog</p>
+                                </div>
+                            </div>
+
+                            <div class="border-t pt-6">
+                                <div class="flex justify-between items-center mb-4">
+                                    <span class="text-lg font-semibold text-resto-dark">Total :</span>
+                                    <span id="cart-total" class="text-2xl font-bold text-resto-primary">Rp 0</span>
+                                </div>
+                                <button id="send-order" onclick="submitOrder()" class="w-full bg-resto-primary text-white py-4 px-4 rounded-lg font-semibold hover:bg-orange-600 transition duration-300 focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                                    <i class="fas fa-paper-plane mr-2"></i>Kirim Pesanan ke Dapur
+                                </button>
+                            </div>
                         </div>
-                        <button id="send-order" onclick="submitOrder()" class="w-full bg-orange-500 text-white py-3 rounded-lg font-bold disabled:opacity-50" disabled>
-                            <i class="fas fa-paper-plane mr-2"></i>Kirim Ke Dapur
-                        </button>
                     </div>
                 </div>
+
+                <button id="open-cart-mobile" class="md:hidden fixed bottom-6 right-6 bg-resto-primary text-white p-4 rounded-full shadow-lg hover:bg-orange-600 transition duration-300 z-20">
+                    <i class="fas fa-shopping-cart text-xl"></i>
+                    <span id="cart-count-badge" class="absolute -top-2 -right-2 bg-resto-danger text-white text-xs rounded-full w-6 h-6 flex items-center justify-center">0</span>
+                </button>
             </div>
         </div>
     </main>
@@ -130,9 +151,10 @@ $menuQuery = $data['menuQuery'];
         function renderCart() {
             const container = document.getElementById('cart-items');
             if(cart.length === 0) {
-                container.innerHTML = '<p class="text-center py-4">Keranjang kosong</p>';
+                container.innerHTML = '<div class="text-center py-8 text-resto-gray"><i class="fas fa-shopping-cart text-4xl mb-3"></i><p>Keranjang kosong</p><p class="text-sm">Tambahkan menu dari katalog</p></div>';
                 document.getElementById('cart-total').textContent = 'Rp 0';
                 document.getElementById('send-order').disabled = true;
+                updateCartCount();
                 return;
             }
             let total = 0;
@@ -149,7 +171,15 @@ $menuQuery = $data['menuQuery'];
                 </div>`;
             }).join('');
             document.getElementById('cart-total').textContent = 'Rp ' + total.toLocaleString('id-ID');
+            updateCartCount();
             validateForm();
+        }
+
+        function updateCartCount() {
+            const badge = document.getElementById('cart-count-badge');
+            if (!badge) return;
+            const count = cart.reduce((sum, item) => sum + item.qty, 0);
+            badge.textContent = count;
         }
 
         function validateForm() {
@@ -160,6 +190,16 @@ $menuQuery = $data['menuQuery'];
 
         document.getElementById('table-select').addEventListener('change', validateForm);
         document.getElementById('customer-name').addEventListener('input', validateForm);
+        document.getElementById('open-cart-mobile').addEventListener('click', openCartMobile);
+        document.getElementById('close-cart-mobile').addEventListener('click', closeCartMobile);
+
+        function openCartMobile() {
+            document.getElementById('mobile-cart-sidebar').classList.remove('translate-x-full');
+        }
+
+        function closeCartMobile() {
+            document.getElementById('mobile-cart-sidebar').classList.add('translate-x-full');
+        }
 
         function submitOrder() {
             const payload = {

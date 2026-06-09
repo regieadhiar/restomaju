@@ -26,7 +26,7 @@ function renderToast() {
     echo '
     <div id="notification-toast" class="fixed bottom-4 right-4 bg-1e293b text-white p-4 rounded-lg shadow-xl transform translate-y-full transition-transform duration-300 z-50 max-w-sm bg-slate-800">
         <div class="flex items-start">
-            <div class="flex-shrink-0"><i id="toast-icon" class="fas fa-check-circle text-green-500 text-xl"></i></div>
+            <div class="shrink-0"><i id="toast-icon" class="fas fa-check-circle text-green-500 text-xl"></i></div>
             <div class="ml-3"><p id="toast-message" class="text-sm font-medium"></p></div>
             <button onclick="closeToast()" class="ml-4 text-slate-400 hover:text-white"><i class="fas fa-times"></i></button>
         </div>

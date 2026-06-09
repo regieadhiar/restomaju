@@ -13,7 +13,7 @@ $orders = $data['orders'];
 <body class="bg-slate-900 text-slate-100 min-h-screen">
     <header class="bg-slate-950 border-b border-slate-800 p-4 sticky top-0 z-10 flex justify-between items-center">
         <div>
-            <h1 class="text-xl font-bold text-white"><i class="fas fa-hat-chef text-orange-500 mr-2"></i>Kitchen Display System</h1>
+            <h1 class="text-xl font-bold text-white">Kitchen Display System</h1>
             <p class="text-xs text-slate-400">Monitor Antrean Masakan Aktif</p>
         </div>
         <div class="flex items-center space-x-6">
