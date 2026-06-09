@@ -24,39 +24,38 @@ $tables = $data['tables'];
 
     <body class="bg-slate-50 min-h-screen">
         <div class="flex relative">
-        <div id="sidebar-overlay" onclick="toggleSidebar()" class="fixed inset-0 bg-black/50 z-40 hidden lg:hidden"></div>
-        <div id="sidebar" class="w-64 bg-slate-900 text-white min-h-screen fixed inset-y-0 left-0 z-50 transform -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out p-6 flex flex-col justify-between">
-            
-            <button onclick="toggleSidebar()" class="absolute top-4 right-4 lg:hidden text-slate-400 hover:text-white">
-                <i class="fas fa-times text-xl"></i>
-            </button>
+            <div id="sidebar-overlay" onclick="toggleSidebar()" class="fixed inset-0 bg-black/50 z-40 hidden lg:hidden"></div>
 
-            <div>
-                <div class="flex items-center space-x-3 mb-8">
-                    <div class="w-10 h-10 bg-orange-500 rounded-full flex items-center justify-center text-white"><i class="fas fa-crown"></i></div>
-                    <div><h2 class="font-bold text-sm">Owner Admin</h2><p class="text-xs text-slate-400">Manajer Restoran</p></div>
+            <aside id="sidebar" class="w-64 bg-slate-900 text-white min-h-screen fixed inset-y-0 left-0 z-50 transform -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out p-6 flex flex-col justify-between">
+                <button onclick="toggleSidebar()" class="absolute top-4 right-4 lg:hidden text-slate-400 hover:text-white">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+
+                <div>
+                    <div class="flex items-center space-x-3 mb-8">
+                        <div class="w-10 h-10 bg-orange-500 rounded-full flex items-center justify-center text-white"><i class="fas fa-crown"></i></div>
+                        <div><h2 class="font-bold text-sm">Owner Admin</h2><p class="text-xs text-slate-400">Manajer Restoran</p></div>
+                    </div>
+                    <nav class="space-y-2">
+                        <a href="?tab=dashboard" class="block <?= $tab === 'dashboard' ? 'bg-orange-500 text-white' : 'text-slate-400 hover:text-white' ?> px-4 py-2.5 rounded-lg font-medium"><i class="fas fa-tachometer-alt mr-3"></i>Dashboard</a>
+                        <a href="?tab=analytics" class="block <?= $tab === 'analytics' ? 'bg-orange-500 text-white' : 'text-slate-400 hover:text-white' ?> px-4 py-2.5 rounded-lg font-medium"><i class="fas fa-chart-bar mr-3"></i>Analitik</a>
+                        <a href="?tab=users" class="block <?= $tab === 'users' ? 'bg-orange-500 text-white' : 'text-slate-400 hover:text-white' ?> px-4 py-2.5 rounded-lg font-medium"><i class="fas fa-users mr-3"></i>Manajemen User</a>
+                        <a href="logout.php" class="block text-slate-400 hover:text-white px-4 py-2.5 rounded-lg"><i class="fas fa-sign-out-alt mr-3"></i>Keluar</a>
+                    </nav>
                 </div>
-                <nav class="space-y-2">
-                    <a href="?tab=dashboard" class="block <?= $tab === 'dashboard' ? 'bg-orange-500 text-white' : 'text-slate-400 hover:text-white' ?> px-4 py-2.5 rounded-lg font-medium"><i class="fas fa-tachometer-alt mr-3"></i>Dashboard</a>
-                    <a href="?tab=analytics" class="block <?= $tab === 'analytics' ? 'bg-orange-500 text-white' : 'text-slate-400 hover:text-white' ?> px-4 py-2.5 rounded-lg font-medium"><i class="fas fa-chart-bar mr-3"></i>Analitik</a>
-                    <a href="?tab=users" class="block <?= $tab === 'users' ? 'bg-orange-500 text-white' : 'text-slate-400 hover:text-white' ?> px-4 py-2.5 rounded-lg font-medium"><i class="fas fa-users mr-3"></i>Manajemen User</a>
-                    <a href="logout.php" class="block text-slate-400 hover:text-white px-4 py-2.5 rounded-lg"><i class="fas fa-sign-out-alt mr-3"></i>Keluar</a>
-                </nav>
-            </div>
-        </div>
+            </aside>
 
-        <div class="flex-1 lg:ml-64 min-w-0 transition-all duration-300">
-            <header class="bg-white shadow-sm p-4 flex justify-between items-center px-4 lg:px-8">
-                
-                <div class="flex items-center space-x-3">
-                    <button onclick="toggleSidebar()" class="lg:hidden text-slate-800 hover:text-orange-500 focus:outline-none">
-                        <i class="fas fa-bars text-xl"></i>
-                    </button>
-                    <h1 class="text-base sm:text-lg lg:text-xl font-bold text-slate-800 line-clamp-1">Ringkasan Operasional</h1>
-                </div>
+            <div class="flex-1 lg:ml-64 min-w-0 transition-all duration-300">
+                <header class="bg-white shadow-sm p-4 flex justify-between items-center px-4 lg:px-8">
+                    <div class="flex items-center space-x-3">
+                        <button onclick="toggleSidebar()" class="lg:hidden text-slate-800 hover:text-orange-500 focus:outline-none">
+                            <i class="fas fa-bars text-xl"></i>
+                        </button>
+                        <h1 class="text-base sm:text-lg lg:text-xl font-bold text-slate-800 line-clamp-1">Ringkasan Operasional Restoran</h1>
+                    </div>
 
-                <span class="text-[10px] sm:text-xs font-semibold bg-slate-100 px-2 sm:px-3 py-1.5 rounded-lg text-slate-500 whitespace-nowrap"><i class="fas fa-calendar mr-1"></i> <?= date('d M') ?></span>
-            </header>
+                    <span class="text-xs font-semibold bg-slate-100 px-3 py-1.5 rounded-lg text-slate-500"><i class="fas fa-calendar mr-1"></i> Hari Ini: <?= date('d M Y') ?></span>
+                </header>
 
             <main class="p-8">
                 <?php if ($tab === 'dashboard'): ?>
@@ -579,16 +578,40 @@ $tables = $data['tables'];
             chart.draw(data_table, options);
         }
 
-        function toggleSidebar() {
+        function toggleSidebar(forceOpen) {
             const sidebar = document.getElementById('sidebar');
             const overlay = document.getElementById('sidebar-overlay');
 
-            // Membuka/menutup sidebar dengan menggeser panel
-            sidebar.classList.toggle('-translate-x-full');
+            // Hanya berlaku untuk mobile (desktop selalu tampil)
+            if (window.innerWidth >= 1024) return;
 
-            // Memunculkan/menyembunyikan overlay gelap
+            const isHidden = sidebar.classList.contains('-translate-x-full');
+
+            if (typeof forceOpen === 'boolean') {
+                if (forceOpen && isHidden) {
+                    sidebar.classList.remove('-translate-x-full');
+                    overlay.classList.remove('hidden');
+                    document.body.classList.add('overflow-hidden');
+                } else if (!forceOpen && !isHidden) {
+                    sidebar.classList.add('-translate-x-full');
+                    overlay.classList.add('hidden');
+                    document.body.classList.remove('overflow-hidden');
+                }
+                return;
+            }
+
+            // Toggle biasa
+            sidebar.classList.toggle('-translate-x-full');
             overlay.classList.toggle('hidden');
+            document.body.classList.toggle('overflow-hidden', !sidebar.classList.contains('-translate-x-full'));
         }
+
+        // Tutup sidebar dengan Escape jika sedang terbuka (mobile)
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && window.innerWidth < 1024) {
+                toggleSidebar(false);
+            }
+        });
 
         function drawTopItemsChart(topItems) {
             if (topItems.length === 0) {
