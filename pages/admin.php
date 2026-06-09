@@ -11,12 +11,28 @@ $totalOrders = $data['totalOrders'];
 $activeMenu = $data['activeMenu'];
 $occupiedTbl = $data['occupiedTbl'];
 
-$incomeToday = $data['incomeToday'];
-$totalOrders = $data['totalOrders'];
-$activeMenu = $data['activeMenu'];
-$occupiedTbl = $data['occupiedTbl'];
 $menus = $data['menus'];
 $tables = $data['tables'];
+
+// Derived statistics for dashboard
+$categoryCounts = [];
+foreach ($menus as $m) {
+    $cat = isset($m['category']) ? $m['category'] : 'lainnya';
+    $categoryCounts[$cat] = ($categoryCounts[$cat] ?? 0) + 1;
+}
+$uniqueCategoryCount = count($categoryCounts);
+
+$availableCount = 0;
+$unavailableCount = 0;
+foreach ($menus as $m) {
+    if (isset($m['status']) && $m['status'] === 'available') $availableCount++; else $unavailableCount++;
+}
+
+// Recent menus (sorted by id desc)
+$recentMenus = $menus;
+usort($recentMenus, function($a, $b){ return ($b['id'] ?? 0) <=> ($a['id'] ?? 0); });
+$recentMenus = array_slice($recentMenus, 0, 5);
+
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -38,6 +54,7 @@ $tables = $data['tables'];
                     </div>
                     <nav class="space-y-2">
                         <a href="?tab=dashboard" class="block <?= $tab === 'dashboard' ? 'bg-orange-500 text-white' : 'text-slate-400 hover:text-white' ?> px-4 py-2.5 rounded-lg font-medium"><i class="fas fa-tachometer-alt mr-3"></i>Dashboard</a>
+                        <a href="?tab=management" class="block <?= $tab === 'management' ? 'bg-orange-500 text-white' : 'text-slate-400 hover:text-white' ?> px-4 py-2.5 rounded-lg font-medium"><i class="fas fa-tools mr-3"></i>Manajemen</a>
                         <a href="?tab=analytics" class="block <?= $tab === 'analytics' ? 'bg-orange-500 text-white' : 'text-slate-400 hover:text-white' ?> px-4 py-2.5 rounded-lg font-medium"><i class="fas fa-chart-bar mr-3"></i>Analitik</a>
                         <a href="?tab=users" class="block <?= $tab === 'users' ? 'bg-orange-500 text-white' : 'text-slate-400 hover:text-white' ?> px-4 py-2.5 rounded-lg font-medium"><i class="fas fa-users mr-3"></i>Manajemen User</a>
                         <a href="logout.php" class="block text-slate-400 hover:text-white px-4 py-2.5 rounded-lg"><i class="fas fa-sign-out-alt mr-3"></i>Keluar</a>
@@ -63,22 +80,60 @@ $tables = $data['tables'];
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
                         <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
                             <div class="text-xs font-bold text-slate-400 uppercase tracking-wider">Pendapatan Hari Ini</div>
-                            <div class="text-2xl font-extrabold text-slate-800 mt-2">Rp <?= number_format($data['incomeToday'], 0, ',', '.') ?></div>
+                            <div class="text-2xl font-extrabold text-slate-800 mt-2">Rp <?= number_format($data['incomeToday'] ?? 0, 0, ',', '.') ?></div>
                         </div>
                         <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
                             <div class="text-xs font-bold text-slate-400 uppercase tracking-wider">Pesanan Selesai</div>
-                            <div class="text-2xl font-extrabold text-slate-800 mt-2"><?= $data['totalOrders'] ?> Transaksi</div>
+                            <div class="text-2xl font-extrabold text-slate-800 mt-2"><?= $data['totalOrders'] ?? 0 ?> Transaksi</div>
                         </div>
                         <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
                             <div class="text-xs font-bold text-slate-400 uppercase tracking-wider">Menu Aktif Siap Jual</div>
-                            <div class="text-2xl font-extrabold text-slate-800 mt-2"><?= $data['activeMenu'] ?> Kuliner</div>
+                            <div class="text-2xl font-extrabold text-slate-800 mt-2"><?= $data['activeMenu'] ?? 0 ?> Kuliner</div>
                         </div>
                         <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
                             <div class="text-xs font-bold text-slate-400 uppercase tracking-wider">Meja Terisi Aktif</div>
-                            <div class="text-2xl font-extrabold text-slate-800 mt-2"><?= $data['occupiedTbl'] ?> / <?= count($data['tables']) ?> Meja</div>
+                            <div class="text-2xl font-extrabold text-slate-800 mt-2"><?= $data['occupiedTbl'] ?? 0 ?> / <?= count($tables) ?> Meja</div>
                         </div>
                     </div>
 
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                        <div class="bg-white rounded-xl shadow p-6">
+                            <h3 class="text-sm font-bold text-slate-800 mb-2">Menu per Kategori</h3>
+                            <div class="text-xs text-slate-500">
+                                <?php if (!empty($categoryCounts)): ?>
+                                    <?php foreach($categoryCounts as $cname => $cnum): ?>
+                                        <div class="flex justify-between text-sm py-1 border-b last:border-b-0"><span><?= ucfirst($cname) ?></span><span class="font-bold"><?= $cnum ?></span></div>
+                                    <?php endforeach; ?>
+                                <?php else: ?>
+                                    <div class="text-slate-400 text-sm">Belum ada menu terdaftar.</div>
+                                <?php endif; ?>
+                            </div>
+                        </div>
+
+                        <div class="bg-white rounded-xl shadow p-6">
+                            <h3 class="text-sm font-bold text-slate-800 mb-2">Ketersediaan Menu</h3>
+                            <div class="text-xs text-slate-500">
+                                <div class="flex justify-between text-sm py-1"><span>Tersedia</span><span class="font-bold text-green-600"><?= $availableCount ?></span></div>
+                                <div class="flex justify-between text-sm py-1"><span>Habis</span><span class="font-bold text-red-600"><?= $unavailableCount ?></span></div>
+                            </div>
+                        </div>
+
+                        <div class="bg-white rounded-xl shadow p-6">
+                            <h3 class="text-sm font-bold text-slate-800 mb-2">Menu Terbaru</h3>
+                            <div class="text-xs text-slate-500">
+                                <?php if (!empty($recentMenus)): ?>
+                                    <?php foreach($recentMenus as $r): ?>
+                                        <div class="py-2 border-b last:border-b-0 flex items-center justify-between"><div class="flex items-center space-x-2"><img src="<?= $r['image'] ?>" class="w-8 h-8 rounded" alt=""><div><div class="font-semibold text-slate-800 text-sm"><?= htmlspecialchars($r['name']) ?></div><div class="text-[11px] text-slate-400 uppercase"><?= $r['category'] ?></div></div></div><div class="text-xs text-slate-500">Rp <?= number_format($r['price'] ?? 0,0,',','.') ?></div></div>
+                                    <?php endforeach; ?>
+                                <?php else: ?>
+                                    <div class="text-slate-400 text-sm">Belum ada menu terbaru.</div>
+                                <?php endif; ?>
+                            </div>
+                        </div>
+                    </div>
+
+                <?php elseif ($tab === 'management'): ?>
+                    <!-- MANAGEMENT TAB: Katalog Menu (per kategori) dan Manajemen Meja -->
                     <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
                         <div class="xl:col-span-2 bg-white rounded-xl shadow p-6">
                             <div class="flex justify-between items-center mb-6">
@@ -87,69 +142,86 @@ $tables = $data['tables'];
                             </div>
 
                             <div class="overflow-x-auto">
-                                <table class="w-full text-left border-collapse">
-                                    <thead>
-                                        <tr class="border-b text-slate-400 text-sm font-medium">
-                                            <th class="pb-3">Foto</th>
-                                            <th class="pb-3">Nama Menu</th>
-                                            <th class="pb-3">Harga</th>
-                                            <th class="pb-3">Status</th>
-                                            <th class="pb-3 text-center">Aksi</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody class="text-sm font-medium text-slate-700 divide-y divide-slate-100">
-                                        <?php foreach($data['menus'] as $m): ?>
-                                            <tr>
-                                                <td class="py-3"><img src="<?= $m['image'] ?>" class="w-12 h-12 object-cover rounded-lg"></td>
-                                                <td class="py-3">
-                                                    <span class="font-semibold text-slate-800 block"><?= htmlspecialchars($m['name']) ?></span>
-                                                    <span class="text-xs uppercase tracking-wider text-slate-400"><?= $m['category'] ?></span>
-                                                </td>
-                                                <td class="py-3 font-bold text-slate-900">Rp <?= number_format($m['price'], 0, ',', '.') ?></td>
-                                                <td class="py-3">
-                                                    <span class="px-2.5 py-1 rounded-full text-xs font-bold <?= $m['status']==='available'?'bg-green-50 text-green-600':'bg-red-50 text-red-600' ?>">
-                                                        <?= $m['status']==='available'?'Tersedia':'Habis' ?>
-                                                    </span>
-                                                </td>
-                                                <td class="py-3 text-center">
-                                                    <div class="flex items-center justify-center space-x-1">
-                                                        <button onclick="openDetailModal(<?= $m['id'] ?>)" class="text-blue-500 w-8 h-8 bg-blue-50 hover:bg-blue-100 rounded-lg" title="Detail Menu"><i class="fas fa-eye"></i></button>
-                                                        <button onclick="openEditModal(<?= $m['id'] ?>)" class="text-amber-500 w-8 h-8 bg-amber-50 hover:bg-amber-100 rounded-lg" title="Edit Menu"><i class="fas fa-edit"></i></button>
-                                                        <form action="?tab=dashboard&action=delete" method="POST" onsubmit="return confirm('Hapus menu ini secara permanen?')" class="inline">
-                                                            <input type="hidden" name="id" value="<?= $m['id'] ?>">
-                                                            <button type="submit" class="text-red-500 w-8 h-8 bg-red-50 hover:bg-red-100 rounded-lg" title="Hapus Menu"><i class="fas fa-trash"></i></button>
-                                                        </form>
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                        <?php endforeach; ?>
-                                    </tbody>
-                                </table>
+                                <?php if (empty($menus)): ?>
+                                    <div class="text-slate-400 text-center py-8">Belum ada menu terdaftar.</div>
+                                <?php else: ?>
+                                    <?php
+                                        // Kelompokkan per kategori
+                                        $byCategory = [];
+                                        foreach ($menus as $m) {
+                                            $cat = $m['category'] ?? 'lainnya';
+                                            if (!isset($byCategory[$cat])) $byCategory[$cat] = [];
+                                            $byCategory[$cat][] = $m;
+                                        }
+                                    ?>
+
+                                    <?php foreach ($byCategory as $catName => $items): ?>
+                                        <h3 class="font-bold text-slate-800 mt-4 mb-2"><?= ucfirst($catName) ?></h3>
+                                        <table class="w-full text-left border-collapse mb-4">
+                                            <thead>
+                                                <tr class="border-b text-slate-400 text-sm font-medium">
+                                                    <th class="pb-3">Foto</th>
+                                                    <th class="pb-3">Nama Menu</th>
+                                                    <th class="pb-3">Harga</th>
+                                                    <th class="pb-3">Status</th>
+                                                    <th class="pb-3 text-center">Aksi</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody class="text-sm font-medium text-slate-700 divide-y divide-slate-100">
+                                                <?php foreach($items as $m): ?>
+                                                    <tr>
+                                                        <td class="py-3"><img src="<?= $m['image'] ?>" class="w-12 h-12 object-cover rounded-lg"></td>
+                                                        <td class="py-3">
+                                                            <span class="font-semibold text-slate-800 block"><?= htmlspecialchars($m['name']) ?></span>
+                                                            <span class="text-xs uppercase tracking-wider text-slate-400"><?= $m['category'] ?></span>
+                                                        </td>
+                                                        <td class="py-3 font-bold text-slate-900">Rp <?= number_format($m['price'] ?? 0, 0, ',', '.') ?></td>
+                                                        <td class="py-3">
+                                                            <span class="px-2.5 py-1 rounded-full text-xs font-bold <?= ($m['status'] ?? '')==='available'?'bg-green-50 text-green-600':'bg-red-50 text-red-600' ?>">
+                                                                <?= ($m['status'] ?? '')==='available'?'Tersedia':'Habis' ?>
+                                                            </span>
+                                                        </td>
+                                                        <td class="py-3 text-center">
+                                                            <div class="flex items-center justify-center space-x-1">
+                                                                <button onclick="openDetailModal(<?= $m['id'] ?>)" class="text-blue-500 w-8 h-8 bg-blue-50 hover:bg-blue-100 rounded-lg" title="Detail Menu"><i class="fas fa-eye"></i></button>
+                                                                <button onclick="openEditModal(<?= $m['id'] ?>)" class="text-amber-500 w-8 h-8 bg-amber-50 hover:bg-amber-100 rounded-lg" title="Edit Menu"><i class="fas fa-edit"></i></button>
+                                                                <form action="?tab=dashboard&action=delete" method="POST" onsubmit="return confirm('Hapus menu ini secara permanen?')" class="inline">
+                                                                    <input type="hidden" name="id" value="<?= $m['id'] ?>">
+                                                                    <button type="submit" class="text-red-500 w-8 h-8 bg-red-50 hover:bg-red-100 rounded-lg" title="Hapus Menu"><i class="fas fa-trash"></i></button>
+                                                                </form>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                <?php endforeach; ?>
+                                            </tbody>
+                                        </table>
+                                    <?php endforeach; ?>
+                                <?php endif; ?>
                             </div>
                         </div>
 
                         <div class="xl:col-span-1 bg-white rounded-xl shadow p-6 h-fit">
                             <h2 class="text-lg font-bold text-slate-800 mb-2">Manajemen Meja</h2>
                             <p class="text-xs text-slate-400 mb-4">Tambah nomor baru atau hapus instalasi meja restoran.</p>
-                            
+
                             <form action="?tab=dashboard&action=add_table" method="POST" class="flex space-x-2 mb-6">
                                 <input type="text" name="table_number" class="flex-1 border p-2 rounded-lg outline-none text-sm focus:ring-2 focus:ring-orange-500" placeholder="Contoh: Meja 21" required>
                                 <button type="submit" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg font-bold text-sm"><i class="fas fa-plus"></i> Tambah</button>
                             </form>
 
                             <div class="overflow-y-auto max-h-[400px] border border-slate-100 rounded-lg divide-y divide-slate-100">
-                                <?php foreach($data['tables'] as $t): ?>
+                                <?php foreach($tables as $t): ?>
                                     <div class="p-3 flex justify-between items-center bg-slate-50/50 hover:bg-slate-50 transition">
                                         <div class="flex items-center space-x-3">
                                             <i class="fas fa-chair text-slate-400 text-sm"></i>
                                             <div>
                                                 <span class="font-bold text-slate-800 text-sm"><?= htmlspecialchars($t['table_number']) ?></span>
-                                                <span class="block text-[10px] uppercase font-bold tracking-wider <?= $t['status']==='empty'?'text-green-500':'text-amber-500' ?>"><?= $t['status'] === 'empty' ? 'Kosong' : 'Terisi' ?></span>
+                                                <span class="block text-[10px] uppercase font-bold tracking-wider <?= ($t['status'] ?? '')==='empty'?'text-green-500':'text-amber-500' ?>"><?= ($t['status'] ?? '') === 'empty' ? 'Kosong' : 'Terisi' ?></span>
                                             </div>
                                         </div>
                                         <form action="?tab=dashboard&action=delete_table" method="POST" onsubmit="return confirm('Hapus pengaturan <?= $t['table_number'] ?> ini?')" class="inline">
                                             <input type="hidden" name="id" value="<?= $t['id'] ?>">
-                                            <button type="submit" class="text-red-500 hover:text-red-700 p-1 text-sm transition" <?= $t['status'] !== 'empty' ? 'disabled class="opacity-30 cursor-not-allowed"' : '' ?> title="Hapus Meja"><i class="fas fa-minus-circle text-lg"></i></button>
+                                            <button type="submit" class="text-red-500 hover:text-red-700 p-1 text-sm transition" <?= ($t['status'] ?? '') !== 'empty' ? 'disabled class="opacity-30 cursor-not-allowed"' : '' ?> title="Hapus Meja"><i class="fas fa-minus-circle text-lg"></i></button>
                                         </form>
                                     </div>
                                 <?php endforeach; ?>
