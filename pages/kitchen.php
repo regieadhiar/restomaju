@@ -14,7 +14,7 @@ $orders = $data['orders'];
     <header class="bg-slate-950 border-b border-slate-800 p-4 sticky top-0 z-10 flex justify-between items-center">
         <div>
             <h1 class="text-xl font-bold text-white">Kitchen Display System</h1>
-            <p class="text-xs text-slate-400">Monitor Antrean Masakan Aktif</p>
+            <p class="text-xs text-resto-gray">Monitor Antrean Masakan Aktif</p>
         </div>
         <div class="flex items-center space-x-6">
             <span class="text-sm text-slate-400"><i class="fas fa-clock mr-1"></i> <span id="clock">00:00:00</span></span>
