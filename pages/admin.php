@@ -22,8 +22,13 @@ $tables = $data['tables'];
 <html lang="id">
 <?php include __DIR__ . '/../components/head.php'; ?>
 <body class="bg-slate-50 min-h-screen">
-    <div class="flex">
-        <div class="w-64 bg-slate-900 text-white min-h-screen fixed p-6 flex flex-col justify-between">
+        <div class="flex relative">
+        <div id="sidebar-overlay" onclick="toggleSidebar()" class="fixed inset-0 bg-black/50 z-40 hidden lg:hidden"></div>
+        <div id="sidebar" class="w-64 bg-slate-900 text-white min-h-screen fixed inset-y-0 left-0 z-50 transform -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out p-6 flex flex-col justify-between">
+            
+            <button onclick="toggleSidebar()" class="absolute top-4 right-4 lg:hidden text-slate-400 hover:text-white">
+                <i class="fas fa-times text-xl"></i>
+            </button>
             <div>
                 <div class="flex items-center space-x-3 mb-8">
                     <div class="w-10 h-10 bg-orange-500 rounded-full flex items-center justify-center text-white"><i class="fas fa-crown"></i></div>
@@ -38,10 +43,17 @@ $tables = $data['tables'];
             </div>
         </div>
 
-        <div class="ml-64 flex-1">
-            <header class="bg-white shadow-sm p-4 flex justify-between items-center px-8">
-                <h1 class="text-xl font-bold text-slate-800">Ringkasan Operasional Restoran</h1>
-                <span class="text-xs font-semibold bg-slate-100 px-3 py-1.5 rounded-lg text-slate-500"><i class="fas fa-calendar mr-1"></i> Hari Ini: <?= date('d M Y') ?></span>
+        <div class="flex-1 lg:ml-64 min-w-0 transition-all duration-300">
+            <header class="bg-white shadow-sm p-4 flex justify-between items-center px-4 lg:px-8">
+                
+                <div class="flex items-center space-x-3">
+                    <button onclick="toggleSidebar()" class="lg:hidden text-slate-800 hover:text-orange-500 focus:outline-none">
+                        <i class="fas fa-bars text-xl"></i>
+                    </button>
+                    <h1 class="text-base sm:text-lg lg:text-xl font-bold text-slate-800 line-clamp-1">Ringkasan Operasional</h1>
+                </div>
+
+                <span class="text-[10px] sm:text-xs font-semibold bg-slate-100 px-2 sm:px-3 py-1.5 rounded-lg text-slate-500 whitespace-nowrap"><i class="fas fa-calendar mr-1"></i> <?= date('d M') ?></span>
             </header>
 
             <main class="p-8">
@@ -564,6 +576,16 @@ $tables = $data['tables'];
             const chart = new google.visualization.AreaChart(document.getElementById('chart_hourly'));
             chart.draw(data_table, options);
         }
+
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebar-overlay');
+
+            // Membuka/menutup sidebar dengan menggeser panel
+            sidebar.classList.toggle('-translate-x-full');
+
+            // Memunculkan/menyembunyikan overlay gelap
+            overlay.classList.toggle('hidden');
 
         function drawTopItemsChart(topItems) {
             if (topItems.length === 0) {
