@@ -22,5 +22,10 @@
             height: 100%;
             z-index: -1;
         }
+        /* Tailwind negative translation utility missing from compiled CSS */
+        .-translate-x-full {
+            --tw-translate-x: -100%;
+            translate: var(--tw-translate-x) var(--tw-translate-y);
+        }
     </style>
 </head>

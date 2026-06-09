@@ -588,7 +588,7 @@ $tables = $data['tables'];
 
             // Memunculkan/menyembunyikan overlay gelap
             overlay.classList.toggle('hidden');
-}
+        }
 
         function drawTopItemsChart(topItems) {
             if (topItems.length === 0) {
