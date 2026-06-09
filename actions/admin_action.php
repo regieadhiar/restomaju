@@ -161,6 +161,53 @@ function handleAdminRequest(PDO $conn): array {
         exit;
     }
 
+    // Ambil data user untuk ditampilkan di Modal Edit
+    if (isset($_GET['action']) && $_GET['action'] === 'get_user' && isset($_GET['id'])) {
+        header('Content-Type: application/json');
+        $id = intval($_GET['id']);
+        $stmt = $conn->prepare("SELECT id, username, role FROM users WHERE id = ?");
+        $stmt->execute([$id]);
+        $user = $stmt->fetch(PDO::FETCH_ASSOC);
+        echo json_encode($user ? $user : ['error' => 'User tidak ditemukan']);
+        exit;
+    }
+
+    // Proses Edit/Update Data User
+    if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_GET['action']) && $_GET['action'] === 'edit_user') {
+        $id = intval($_POST['id']);
+        $username = trim($_POST['username']);
+        $role = $_POST['role'];
+        $password = trim($_POST['password']);
+
+        try {
+            if (!empty($password)) {
+                $hashedPass = password_hash($password, PASSWORD_BCRYPT);
+                $stmt = $conn->prepare("UPDATE users SET username = ?, role = ?, password = ? WHERE id = ?");
+                $stmt->execute([$username, $role, $hashedPass, $id]);
+            } else {
+                $stmt = $conn->prepare("UPDATE users SET username = ?, role = ? WHERE id = ?");
+                $stmt->execute([$username, $role, $id]);
+            }
+            header("Location: admin.php?tab=users&msg=Data user berhasil diperbarui!&type=success");
+        } catch(Exception $e) {
+            header("Location: admin.php?tab=users&msg=Gagal! Username mungkin sudah terdaftar.&type=error");
+        }
+        exit;
+    }
+
+    // Proses Hapus User
+    if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_GET['action']) && $_GET['action'] === 'delete_user' && isset($_POST['id'])) {
+        $id = intval($_POST['id']);
+        
+        // Opsional: Proteksi agar admin tidak menghapus dirinya sendiri (Misal ID admin yang sedang login adalah 4)
+        // if ($id === 4) { ... } 
+
+        $stmt = $conn->prepare("DELETE FROM users WHERE id = ?");
+        $stmt->execute([$id]);
+        header("Location: admin.php?tab=users&msg=User berhasil dihapus dari sistem!&type=success");
+        exit;
+    }
+
     return [
         'incomeToday' => $conn->query("SELECT SUM(total_amount) FROM orders WHERE status = 'paid' AND DATE(created_at) = CURRENT_DATE")->fetchColumn() ?? 0,
         'totalOrders' => $conn->query("SELECT COUNT(*) FROM orders WHERE status = 'paid' AND DATE(created_at) = CURRENT_DATE")->fetchColumn() ?? 0,
