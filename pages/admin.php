@@ -21,7 +21,8 @@ $tables = $data['tables'];
 <!DOCTYPE html>
 <html lang="id">
 <?php include __DIR__ . '/../components/head.php'; ?>
-<body class="bg-slate-50 min-h-screen">
+
+    <body class="bg-slate-50 min-h-screen">
         <div class="flex relative">
         <div id="sidebar-overlay" onclick="toggleSidebar()" class="fixed inset-0 bg-black/50 z-40 hidden lg:hidden"></div>
         <div id="sidebar" class="w-64 bg-slate-900 text-white min-h-screen fixed inset-y-0 left-0 z-50 transform -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out p-6 flex flex-col justify-between">
@@ -29,6 +30,7 @@ $tables = $data['tables'];
             <button onclick="toggleSidebar()" class="absolute top-4 right-4 lg:hidden text-slate-400 hover:text-white">
                 <i class="fas fa-times text-xl"></i>
             </button>
+
             <div>
                 <div class="flex items-center space-x-3 mb-8">
                     <div class="w-10 h-10 bg-orange-500 rounded-full flex items-center justify-center text-white"><i class="fas fa-crown"></i></div>
@@ -586,6 +588,7 @@ $tables = $data['tables'];
 
             // Memunculkan/menyembunyikan overlay gelap
             overlay.classList.toggle('hidden');
+}
 
         function drawTopItemsChart(topItems) {
             if (topItems.length === 0) {
