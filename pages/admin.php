@@ -297,6 +297,7 @@ $recentMenus = array_slice($recentMenus, 0, 5);
                                         <th class="pb-3">Username</th>
                                         <th class="pb-3">Role</th>
                                         <th class="pb-3">Dibuat Pada</th>
+                                        <th class="pb-3 text-center">Aksi</th>
                                     </tr>
                                 </thead>
                                 <tbody class="text-sm font-medium text-slate-700 divide-y divide-slate-100">
@@ -316,6 +317,18 @@ $recentMenus = array_slice($recentMenus, 0, 5);
                                                 </span>
                                             </td>
                                             <td class="py-3 text-slate-500"><?= date('d M Y H:i', strtotime($u['created_at'])) ?></td>
+
+                                            <td class="py-3 text-center">
+                                                <div class="flex items-center justify-center space-x-1">
+                                                    <button onclick="openEditUserModal(<?= $u['id'] ?>)" class="text-amber-500 w-8 h-8 bg-amber-50 hover:bg-amber-100 rounded-lg" title="Edit User"><i class="fas fa-edit"></i></button>
+                                                    <?php if ($u['id'] != $_SESSION['user_id']): ?>
+                                                        <form action="?tab=users&action=delete_user" method="POST" onsubmit="return confirm('Hapus akun <?= htmlspecialchars($u['username']) ?> secara permanen?')" class="inline">
+                                                            <input type="hidden" name="id" value="<?= $u['id'] ?>">
+                                                            <button type="submit" class="text-red-500 w-8 h-8 bg-red-50 hover:bg-red-100 rounded-lg" title="Hapus User"><i class="fas fa-trash"></i></button>
+                                                        </form>
+                                                    <?php endif; ?>
+                                                </div>
+                                            </td>
                                         </tr>
                                     <?php endforeach; ?>
                                 </tbody>
@@ -437,6 +450,39 @@ $recentMenus = array_slice($recentMenus, 0, 5);
         </div>
     </div>
 
+    <div id="edit-user-modal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-2xl w-full max-w-md p-6">
+            <div class="flex justify-between items-center border-b pb-3 mb-4">
+                <h3 class="text-lg font-bold text-slate-800">Edit Data User</h3>
+                <button onclick="closeModal('edit-user-modal')" class="text-slate-400 hover:text-slate-600"><i class="fas fa-times text-xl"></i></button>
+            </div>
+            <form action="?tab=users&action=edit_user" method="POST" class="space-y-4">
+                <input type="hidden" id="edit-user-id" name="id">
+                <div>
+                    <label class="text-xs font-bold block mb-1">Username</label>
+                    <input type="text" id="edit-user-username" name="username" class="w-full border p-2.5 rounded-lg outline-none focus:ring-2 focus:ring-amber-500" required>
+                </div>
+                <div>
+                    <label class="text-xs font-bold block mb-1">Password Baru <span class="text-slate-400 font-normal">(Opsional)</span></label>
+                    <input type="password" name="password" class="w-full border p-2.5 rounded-lg outline-none focus:ring-2 focus:ring-amber-500" placeholder="Kosongkan jika tidak ingin ganti password">
+                </div>
+                <div>
+                    <label class="text-xs font-bold block mb-1">Role / Jabatan</label>
+                    <select id="edit-user-role" name="role" class="w-full border p-2.5 rounded-lg bg-white focus:ring-2 focus:ring-amber-500">
+                        <option value="waiter">Pelayan</option>
+                        <option value="kitchen">Dapur / Chef</option>
+                        <option value="cashier">Kasir</option>
+                        <option value="admin">Admin</option>
+                    </select>
+                </div>
+                <div class="flex justify-end space-x-2 border-t pt-3">
+                    <button type="button" onclick="closeModal('edit-user-modal')" class="border px-4 py-2 rounded-lg font-bold text-sm">Batal</button>
+                    <button type="submit" class="bg-amber-500 text-white px-4 py-2 rounded-lg font-bold text-sm">Simpan Perubahan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <?php renderToast(); ?>
 
     <script src="https://www.gstatic.com/charts/loader.js"></script>
@@ -458,6 +504,23 @@ $recentMenus = array_slice($recentMenus, 0, 5);
         function openCreateUserModal() {
             const m = document.getElementById('create-user-modal');
             m.classList.remove('hidden'); m.classList.add('flex');
+        }
+
+        function openEditUserModal(id) {
+            fetch('?tab=users&action=get_user&id=' + id)
+            .then(res => res.json())
+            .then(data => {
+                if(data.error) return alert(data.error);
+                
+                // Isi otomatis form edit dengan data user dari database
+                document.getElementById('edit-user-id').value = data.id;
+                document.getElementById('edit-user-username').value = data.username;
+                document.getElementById('edit-user-role').value = data.role;
+                
+                const m = document.getElementById('edit-user-modal');
+                m.classList.remove('hidden'); 
+                m.classList.add('flex');
+            });
         }
 
         function openEditModal(id) {
