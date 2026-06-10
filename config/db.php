@@ -1,31 +1,56 @@
 <?php
-session_start();
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 
 $secrets = [];
 
-if (file_exists(__DIR__ . '/../.env')) {
-    $lines = file(__DIR__ . '/../.env', FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+// 1. CEK VERSI LOCAL (Laptop / Laragon)
+// Mencari file .env naik 1 level dari folder config (yaitu di folder utama 'restoran')
+$local_env = dirname(__DIR__) . '/.env';
+
+if (file_exists($local_env)) {
+    // Baca file .env teks biasa milik Laragon
+    $lines = file($local_env, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
     foreach ($lines as $line) {
-        if (strpos(trim($line), '#') === 0) continue; // Skip comments
-        list($key, $value) = explode('=', $line, 2);
-        $secrets[trim($key)] = trim($value);
+        if (strpos(trim($line), '#') === 0) continue; // Lewati komentar
+        if (strpos($line, '=') !== false) {
+            list($key, $value) = explode('=', $line, 2);
+            $secrets[trim($key)] = trim($value, " \t\n\r\0\x0B\"'");
+        }
     }
-} else {
-    $secrets = include(__DIR__ . '/home/studioeg/.env.resto.php');
+} 
+// 2. CEK VERSI PRODUCTION (cPanel)
+else {
+    // Berdasarkan error log Anda, nama file rahasia Anda adalah .env.resto.php
+    // Kita tulis jalurnya secara murni (MANDIRI) tanpa digabung dengan __DIR__
+    $cpanel_secret_path = '/home/studioeg/.env.php';
+
+    if (file_exists($cpanel_secret_path)) {
+        $secrets = include $cpanel_secret_path; 
+    } else {
+        die("Gagal memuat konfigurasi: File rahasia tidak ditemukan di cPanel (" . $cpanel_secret_path . ") maupun di Lokal (" . $local_env . ").");
+    }
 }
 
+// 3. EKSTRAK VARIABEL DATABASE
 $host     = $secrets['DB_HOST'] ?? 'localhost';
 $username = $secrets['DB_USER'] ?? '';
 $password = $secrets['DB_PASS'] ?? '';
 $dbname   = $secrets['DB_NAME'] ?? '';
 
-try {
-    $conn = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8", $username, $password);
-    $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-} catch(PDOException $e) {
-    die("Koneksi database gagal: " . $e->getMessage());
+if (empty($password)) {
+    die("Proses Berhenti: Password database kosong. Periksa isi file .env atau .env.resto.php Anda.");
 }
 
+try {
+    // Ubah nama variabel dari $pdo menjadi $conn agar sesuai dengan index.php Anda
+    $conn = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8mb4", $username, $password);
+    $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    
+} catch (PDOException $e) {
+    die("Koneksi database gagal: " . $e->getMessage());
+}
 // Fungsi proteksi role halaman
 function checkRole($allowed_role) {
     if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== $allowed_role) {
