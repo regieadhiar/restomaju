@@ -54,7 +54,8 @@ $recentMenus = array_slice($recentMenus, 0, 5);
                     </div>
                     <nav class="space-y-2">
                         <a href="?tab=dashboard" class="block <?= $tab === 'dashboard' ? 'bg-orange-500 text-white' : 'text-slate-400 hover:text-white' ?> px-4 py-2.5 rounded-lg font-medium"><i class="fas fa-tachometer-alt mr-3"></i>Dashboard</a>
-                        <a href="?tab=management" class="block <?= $tab === 'management' ? 'bg-orange-500 text-white' : 'text-slate-400 hover:text-white' ?> px-4 py-2.5 rounded-lg font-medium"><i class="fas fa-tools mr-3"></i>Manajemen</a>
+                        <a href="?tab=menu" class="block <?= $tab === 'menu' ? 'bg-orange-500 text-white' : 'text-slate-400 hover:text-white' ?> px-4 py-2.5 rounded-lg font-medium"><i class="fas fa-utensils mr-3"></i>Manajemen Menu</a>
+                        <a href="?tab=meja" class="block <?= $tab === 'meja' ? 'bg-orange-500 text-white' : 'text-slate-400 hover:text-white' ?> px-4 py-2.5 rounded-lg font-medium"><i class="fas fa-chair mr-3"></i>Manajemen Meja</a>
                         <a href="?tab=analytics" class="block <?= $tab === 'analytics' ? 'bg-orange-500 text-white' : 'text-slate-400 hover:text-white' ?> px-4 py-2.5 rounded-lg font-medium"><i class="fas fa-chart-bar mr-3"></i>Analitik</a>
                         <a href="?tab=users" class="block <?= $tab === 'users' ? 'bg-orange-500 text-white' : 'text-slate-400 hover:text-white' ?> px-4 py-2.5 rounded-lg font-medium"><i class="fas fa-users mr-3"></i>Manajemen User</a>
                         <a href="logout.php" class="block text-slate-400 hover:text-white px-4 py-2.5 rounded-lg"><i class="fas fa-sign-out-alt mr-3"></i>Keluar</a>
@@ -132,14 +133,18 @@ $recentMenus = array_slice($recentMenus, 0, 5);
                         </div>
                     </div>
 
-                <?php elseif ($tab === 'management'): ?>
-                    <!-- MANAGEMENT TAB: Katalog Menu (per kategori) dan Manajemen Meja -->
-                    <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
+                <?php elseif ($tab === 'menu'): ?>
                         <div class="xl:col-span-2 bg-white rounded-xl shadow p-6">
                             <div class="flex justify-between items-center mb-6">
-                                <h2 class="text-lg font-bold text-slate-800">Katalog & Manajemen Menu</h2>
-                                <button onclick="openAddModal()" class="bg-orange-500 text-white px-4 py-2 rounded-lg font-bold hover:bg-orange-600 transition text-sm"><i class="fas fa-plus mr-2"></i>Tambah Menu</button>
+                                <h2 class="text-lg font-bold text-resto-dark">Katalog & Manajemen Menu</h2>
+                                <button onclick="openAddModal()" class="bg-resto-primary text-white px-4 py-2 rounded-lg font-bold hover:bg-orange-600 transition text-sm"><i class="fas fa-plus"></i><span class="hidden md:inline ml-2">Tambah Menu</span></button>
                             </div>
+                            <div class="flex space-x-2 mb-6 overflow-x-auto pb-2">
+                                <button onclick="filterMenu('all')" data-category="all" class="cat-btn px-4 py-2 bg-resto-primary text-white rounded-lg"><i class="fas fa-list mr-2"></i>Semua</button>
+                                <button onclick="filterMenu('food')" data-category="food" class="cat-btn px-4 py-2 bg-white border border-slate-200 text-slate-700 rounded-lg"><i class="fas fa-utensils mr-2"></i>Makanan</button>
+                                <button onclick="filterMenu('drink')" data-category="drink" class="cat-btn px-4 py-2 bg-white border border-slate-200 text-slate-700 rounded-lg"><i class="fas fa-glass-whiskey mr-2"></i>Minuman</button>
+                                <button onclick="filterMenu('snack')" data-category="snack" class="cat-btn px-4 py-2 bg-white border border-slate-200 text-slate-700 rounded-lg"><i class="fas fa-cookie mr-2"></i>Cemilan</button>
+                            </div>  
 
                             <div class="overflow-x-auto">
                                 <?php if (empty($menus)): ?>
@@ -156,7 +161,7 @@ $recentMenus = array_slice($recentMenus, 0, 5);
                                     ?>
 
                                     <?php foreach ($byCategory as $catName => $items): ?>
-                                        <h3 class="font-bold text-slate-800 mt-4 mb-2"><?= ucfirst($catName) ?></h3>
+                                        <h3 class="font-bold text-resto-dark mt-4 mb-2"><?= ucfirst($catName) ?></h3>
                                         <table class="w-full text-left border-collapse mb-4">
                                             <thead>
                                                 <tr class="border-b text-slate-400 text-sm font-medium">
@@ -193,13 +198,14 @@ $recentMenus = array_slice($recentMenus, 0, 5);
                                                         </td>
                                                     </tr>
                                                 <?php endforeach; ?>
-                                            </tbody>
+                                            </tbody>    
                                         </table>
                                     <?php endforeach; ?>
                                 <?php endif; ?>
                             </div>
                         </div>
 
+                <?php elseif ($tab === 'meja'): ?>
                         <div class="xl:col-span-1 bg-white rounded-xl shadow p-6 h-fit">
                             <h2 class="text-lg font-bold text-slate-800 mb-2">Manajemen Meja</h2>
                             <p class="text-xs text-slate-400 mb-4">Tambah nomor baru atau hapus instalasi meja restoran.</p>
@@ -209,7 +215,7 @@ $recentMenus = array_slice($recentMenus, 0, 5);
                                 <button type="submit" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg font-bold text-sm"><i class="fas fa-plus"></i> Tambah</button>
                             </form>
 
-                            <div class="overflow-y-auto max-h-[400px] border border-slate-100 rounded-lg divide-y divide-slate-100">
+                            <div class="overflow-y-auto max-h-[600px] border border-slate-100 rounded-lg divide-y divide-slate-100">
                                 <?php foreach($tables as $t): ?>
                                     <div class="p-3 flex justify-between items-center bg-slate-50/50 hover:bg-slate-50 transition">
                                         <div class="flex items-center space-x-3">
@@ -228,7 +234,6 @@ $recentMenus = array_slice($recentMenus, 0, 5);
                             </div>
                         </div>
                     </div>
-
                 <?php elseif ($tab === 'analytics'): ?>
                     <!-- ANALYTICS TAB -->
                     <div class="mb-6 flex space-x-2">
@@ -520,6 +525,26 @@ $recentMenus = array_slice($recentMenus, 0, 5);
                 const m = document.getElementById('edit-user-modal');
                 m.classList.remove('hidden'); 
                 m.classList.add('flex');
+            });
+        }
+
+        function filterMenu(cat) {
+            document.querySelectorAll('.menu-item').forEach(el => {
+                if(cat === 'all' || el.dataset.category === cat) el.classList.remove('hidden');
+                else el.classList.add('hidden');
+            });
+            setActiveCategory(cat);
+        }
+
+        function setActiveCategory(cat) {
+            document.querySelectorAll('.cat-btn').forEach(btn => {
+                if(btn.dataset.category === cat) {
+                    btn.classList.remove('bg-white', 'border-slate-200', 'text-slate-700');
+                    btn.classList.add('bg-orange-500', 'text-white', 'border-orange-500');
+                } else {
+                    btn.classList.remove('bg-orange-500', 'text-white', 'border-orange-500');
+                    btn.classList.add('bg-white', 'border-slate-200', 'text-slate-700');
+                }
             });
         }
 

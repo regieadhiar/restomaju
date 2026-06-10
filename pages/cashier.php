@@ -136,7 +136,7 @@ $tables = $data['tables'];
             <div id="receipt-content" class="p-6 space-y-4 receipt-card"></div>
             <div class="flex justify-end gap-3 p-6 border-t no-print">
                 <button type="button" onclick="closeReceiptPopup()" class="px-4 py-2 rounded-lg border border-slate-300 text-slate-700 hover:bg-slate-100">Tutup</button>
-                <button type="button" onclick="printReceiptPdf()" class="px-4 py-2 rounded-lg border border-slate-300 text-slate-700 hover:bg-slate-100">Cetak PDF</button>
+                <!-- <button type="button" onclick="printReceiptPdf()" class="px-4 py-2 rounded-lg border border-slate-300 text-slate-700 hover:bg-slate-100">Cetak PDF</button> -->
             </div>
         </div>  
     </div>
@@ -360,21 +360,24 @@ $tables = $data['tables'];
             document.getElementById('receipt-modal').classList.add('hidden');
         }
 
-        function printReceiptPdf() {
-            const element = document.getElementById('receipt-content');
+        // function printReceiptPdf() {
+        //     const element = document.getElementById('receipt-content');
 
-            const elementHeight = Math.ceil(element.offsetHeight * 0.264583) + 10;
+        //     const elementHeight = Math.ceil(element.offsetHeight * 0.264583) + 10;
 
-            const opt = {
-                margin:       0,
-                filename:     'struk-pembayaran.pdf',
-                image:        { type: 'jpeg', quality: 0.98 },
-                html2canvas:  { scale: 3 },
-                jsPDF:        { unit: 'mm', format: [110, elementHeight], orientation: 'portrait' }
-            };
+        //     const opt = {
+        //         margin:       0,
+        //         filename:     'struk-pembayaran.pdf',
+        //         image:        { type: 'jpeg', quality: 0.98 },
+        //         html2canvas:  { scale: 3 },
+        //         jsPDF:        { unit: 'mm', format: [110, elementHeight], orientation: 'portrait' }
+        //     };
 
-            html2pdf().set(opt).from(element).save();
-        }
+        //     html2pdf().set(opt).from(element).outputPdf().then(() => {
+        //         closeReceiptPopup();
+        //         window.open(URL.createObjectURL(new Blob([html2pdf().outputPdf()], { type: 'application/pdf' })), '_blank');
+        //     });
+        // }
 
     </script>
 </body>

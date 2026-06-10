@@ -1,10 +1,23 @@
 <?php
 session_start();
 
-$host     = "localhost";
-$username = "root"; 
-$password = "root"; 
-$dbname   = "restoran";
+$secrets = [];
+
+if (file_exists(__DIR__ . '/../.env')) {
+    $lines = file(__DIR__ . '/../.env', FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+    foreach ($lines as $line) {
+        if (strpos(trim($line), '#') === 0) continue; // Skip comments
+        list($key, $value) = explode('=', $line, 2);
+        $secrets[trim($key)] = trim($value);
+    }
+} else {
+    $secrets = include(__DIR__ . '/home/studioeg/.env.resto.php');
+}
+
+$host     = $secrets['DB_HOST'] ?? 'localhost';
+$username = $secrets['DB_USER'] ?? '';
+$password = $secrets['DB_PASS'] ?? '';
+$dbname   = $secrets['DB_NAME'] ?? '';
 
 try {
     $conn = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8", $username, $password);
