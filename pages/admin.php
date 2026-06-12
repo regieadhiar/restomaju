@@ -477,7 +477,6 @@ $recentMenus = array_slice($recentMenus, 0, 5);
                         <option value="waiter">Pelayan</option>
                         <option value="kitchen">Dapur / Chef</option>
                         <option value="cashier">Kasir</option>
-                        <option value="admin">Admin</option>
                     </select>
                 </div>
                 <div class="flex justify-end space-x-2 border-t pt-3">
