@@ -22,7 +22,7 @@ function handleAdminRequest(PDO $conn): array {
 
             $stmt = $conn->prepare("INSERT INTO menu_items (name, category, price, status, image, description) VALUES (?, ?, ?, ?, ?, ?)");
             $stmt->execute([$name, $cat, $prc, $sts, $img, $dsc]);
-            header("Location: admin.php?tab=menu&msg=Menu baru berhasil ditambahkan!");
+            header("Location: admin.php?msg=Menu baru berhasil ditambahkan!");
             exit;
         }
 
@@ -37,7 +37,7 @@ function handleAdminRequest(PDO $conn): array {
 
             $stmt = $conn->prepare("UPDATE menu_items SET name = ?, category = ?, price = ?, status = ?, image = ?, description = ? WHERE id = ?");
             $stmt->execute([$name, $cat, $prc, $sts, $img, $dsc, $id]);
-            header("Location: admin.php?tab=menu&msg=Menu berhasil diperbarui!");
+            header("Location: admin.php?msg=Menu berhasil diperbarui!");
             exit;
         }
 
@@ -45,7 +45,7 @@ function handleAdminRequest(PDO $conn): array {
             $id = intval($_POST['id']);
             $stmt = $conn->prepare("DELETE FROM menu_items WHERE id = ?");
             $stmt->execute([$id]);
-            header("Location: admin.php?tab=menu&msg=Menu berhasil dihapus!");
+            header("Location: admin.php?msg=Menu berhasil dihapus!");
             exit;
         }
 
@@ -54,11 +54,11 @@ function handleAdminRequest(PDO $conn): array {
             $stmtCheck = $conn->prepare("SELECT COUNT(*) FROM restaurant_tables WHERE table_number = ?");
             $stmtCheck->execute([$table_number]);
             if ($stmtCheck->fetchColumn() > 0) {
-                header("Location: admin.php?tab=meja&msg=Nomor meja sudah terdaftar!&type=error");
+                header("Location: admin.php?msg=Nomor meja sudah terdaftar!&type=error");
             } else {
                 $stmt = $conn->prepare("INSERT INTO restaurant_tables (table_number, status) VALUES (?, 'empty')");
                 $stmt->execute([$table_number]);
-                header("Location: admin.php?tab=meja&msg=Meja baru berhasil ditambahkan!");
+                header("Location: admin.php?msg=Meja baru berhasil ditambahkan!");
             }
             exit;
         }
@@ -70,11 +70,11 @@ function handleAdminRequest(PDO $conn): array {
             $status = $stmtCheck->fetchColumn();
 
             if ($status !== 'empty') {
-                header("Location: admin.php?tab=meja&msg=Gagal! Meja sedang aktif digunakan pelanggan.&type=warning");
+                header("Location: admin.php?msg=Gagal! Meja sedang aktif digunakan pelanggan.&type=warning");
             } else {
                 $stmt = $conn->prepare("DELETE FROM restaurant_tables WHERE id = ?");
                 $stmt->execute([$id]);
-                header("Location: admin.php?tab=meja&msg=Meja berhasil dihapus dari sistem!");
+                header("Location: admin.php?msg=Meja berhasil dihapus dari sistem!");
             }
             exit;
         }
