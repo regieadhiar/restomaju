@@ -54,8 +54,7 @@ $recentMenus = array_slice($recentMenus, 0, 5);
                     </div>
                     <nav class="space-y-2">
                         <a href="?tab=dashboard" class="block <?= $tab === 'dashboard' ? 'bg-orange-500 text-white' : 'text-slate-400 hover:text-white' ?> px-4 py-2.5 rounded-lg font-medium"><i class="fas fa-tachometer-alt mr-3"></i>Dashboard</a>
-                        <a href="?tab=menu" class="block <?= $tab === 'menu' ? 'bg-orange-500 text-white' : 'text-slate-400 hover:text-white' ?> px-4 py-2.5 rounded-lg font-medium"><i class="fas fa-utensils mr-3"></i>Manajemen Menu</a>
-                        <a href="?tab=meja" class="block <?= $tab === 'meja' ? 'bg-orange-500 text-white' : 'text-slate-400 hover:text-white' ?> px-4 py-2.5 rounded-lg font-medium"><i class="fas fa-chair mr-3"></i>Manajemen Meja</a>
+                        <a href="?tab=management" class="block <?= $tab === 'management' ? 'bg-orange-500 text-white' : 'text-slate-400 hover:text-white' ?> px-4 py-2.5 rounded-lg font-medium"><i class="fas fa-tools mr-3"></i>Manajemen</a>
                         <a href="?tab=analytics" class="block <?= $tab === 'analytics' ? 'bg-orange-500 text-white' : 'text-slate-400 hover:text-white' ?> px-4 py-2.5 rounded-lg font-medium"><i class="fas fa-chart-bar mr-3"></i>Analitik</a>
                         <a href="?tab=users" class="block <?= $tab === 'users' ? 'bg-orange-500 text-white' : 'text-slate-400 hover:text-white' ?> px-4 py-2.5 rounded-lg font-medium"><i class="fas fa-users mr-3"></i>Manajemen User</a>
                         <a href="logout.php" class="block text-slate-400 hover:text-white px-4 py-2.5 rounded-lg"><i class="fas fa-sign-out-alt mr-3"></i>Keluar</a>
@@ -133,11 +132,84 @@ $recentMenus = array_slice($recentMenus, 0, 5);
                         </div>
                     </div>
 
-                <?php elseif ($tab === 'menu'): ?>
-                        <div class="xl:col-span-2 bg-white rounded-xl shadow p-6">
-                            <div class="flex justify-between items-center mb-6">
-                                <h2 class="text-lg font-bold text-resto-dark">Katalog & Manajemen Menu</h2>
-                                <button onclick="openAddModal()" class="bg-resto-primary text-white px-4 py-2 rounded-lg font-bold hover:bg-orange-600 transition text-sm"><i class="fas fa-plus"></i><span class="hidden md:inline ml-2">Tambah Menu</span></button>
+                <?php elseif ($tab === 'management'): ?>
+                   <!-- CONTAINER RESPONSIVE LAYOUT -->
+    <div class="px-4 pt-4 pb-24 md:p-8 max-w-md mx-auto md:max-w-full">
+        
+        <!-- HEADER & TOMBOL TAMBAH MENU -->
+        <div class="flex justify-between items-center mb-6">
+            <h1 class="text-xl md:text-2xl font-bold text-gray-800">Katalog & Manajemen Menu</h1>
+            <button onclick="openAddModal()" class="bg-orange-500 hover:bg-orange-600 text-white p-3 rounded-xl shadow-md transition-all flex items-center justify-center cursor-pointer">
+                <i class="fa-solid fa-plus text-sm"></i>
+            </button>
+        </div>
+
+        <!-- SEARCH BAR (PENCARIAN NYATA) -->
+        <div class="relative mb-6">
+            <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-gray-400">
+                <i class="fa-solid fa-magnifying-glass"></i>
+            </span>
+            <input type="text" id="search-input" onkeyup="searchMenu()" placeholder="Cari menu restoran..." class="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500">
+        </div>
+
+        <!-- FILTER KATEGORI SESUAI ENUM DATABASE -->
+        <div class="grid grid-cols-4 gap-2 mb-6">
+            <button onclick="filterMenu('all')" id="btn-all" class="category-btn p-3 rounded-xl font-semibold text-xs flex flex-col items-center justify-center gap-2 transition-all duration-200 bg-orange-50 text-orange-600 border border-orange-100 cursor-pointer text-center">
+                <div class="w-8 h-8 rounded-lg bg-orange-500 text-white flex items-center justify-center text-sm shadow-md">
+                    <i class="fa-solid fa-list"></i>
+                </div>
+                Semua
+            </button>
+            <button onclick="filterMenu('food')" id="btn-food" class="category-btn p-3 rounded-xl font-semibold text-xs flex flex-col items-center justify-center gap-2 transition-all duration-200 bg-white border border-gray-100 text-gray-600 hover:bg-gray-50 cursor-pointer text-center">
+                <div class="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-500 flex items-center justify-center text-sm">
+                    <i class="fa-solid fa-utensils"></i>
+                </div>
+                Makanan
+            </button>
+            <button onclick="filterMenu('drink')" id="btn-drink" class="category-btn p-3 rounded-xl font-semibold text-xs flex flex-col items-center justify-center gap-2 transition-all duration-200 bg-white border border-gray-100 text-gray-600 hover:bg-gray-50 cursor-pointer text-center">
+                <div class="w-8 h-8 rounded-lg bg-blue-50 text-blue-500 flex items-center justify-center text-sm">
+                    <i class="fa-solid fa-glass-water"></i>
+                </div>
+                Minuman
+            </button>
+            <button onclick="filterMenu('snack')" id="btn-snack" class="category-btn p-3 rounded-xl font-semibold text-xs flex flex-col items-center justify-center gap-2 transition-all duration-200 bg-white border border-gray-100 text-gray-600 hover:bg-gray-50 cursor-pointer text-center">
+                <div class="w-8 h-8 rounded-lg bg-purple-50 text-purple-500 flex items-center justify-center text-sm">
+                    <i class="fa-solid fa-cookie-bite"></i>
+                </div>
+                Cemilan
+            </button>
+        </div>
+
+        <!-- DAFTAR CARD STRUKTUR VERTIKAL (ANTI-MELUBER DI HP) -->
+        <div class="space-y-4" id="menu-container">
+            <?php
+            // Mengambil query data items dari tabel menu_items database kelompokmu
+            $menu_query = mysqli_query($conn, "SELECT * FROM menu_items ORDER BY id DESC");
+            while ($item = mysqli_fetch_assoc($menu_query)) {
+                $available = ($item['status'] === 'available');
+            ?>
+                <div class="menu-item flex p-3 rounded-2xl bg-white border border-gray-100 shadow-sm gap-4 items-center" data-category="<?= $item['category']; ?>" data-name="<?= strtolower($item['name']); ?>">
+                    
+                    <!-- Gambar Menu -->
+                    <img src="<?= $item['image']; ?>" alt="<?= $item['name']; ?>" class="w-20 h-20 rounded-xl object-cover shrink-0 bg-gray-50">
+                    
+                    <!-- Detail Informasi Teks -->
+                    <div class="flex flex-col justify-between flex-1 min-w-0">
+                        <div class="min-w-0">
+                            <h3 class="font-bold text-gray-800 text-base leading-tight truncate"><?= $item['name']; ?></h3>
+                            <span class="inline-block text-[10px] font-bold uppercase tracking-wider text-gray-400 mt-0.5">
+                                <?= $item['category']; ?>
+                            </span>
+                        </div>
+                        
+                        <div class="flex items-center justify-between mt-2">
+                            <div class="flex flex-col">
+                                <span class="font-black text-gray-900 text-sm">
+                                    Rp <?= number_format($item['price'], 0, ',', '.'); ?>
+                                </span>
+                                <span class="text-[11px] font-bold mt-0.5 <?= $available ? 'text-emerald-500' : 'text-red-500'; ?>">
+                                    <?= $available ? 'Tersedia' : 'Habis'; ?>
+                                </span>
                             </div>
                             <div class="flex space-x-2 mb-6 overflow-x-auto pb-2">
                                 <button onclick="filterMenu('all')" data-category="all" class="cat-btn px-4 py-2 bg-resto-primary text-white rounded-lg"><i class="fas fa-list mr-2"></i>Semua</button>
@@ -208,8 +280,12 @@ $recentMenus = array_slice($recentMenus, 0, 5);
                                 <?php endif; ?>
                             </div>
                         </div>
+                    </div>
 
-                <?php elseif ($tab === 'meja'): ?>
+                </div>
+            <?php } ?>
+        </div>
+    </div>
                         <div class="xl:col-span-1 bg-white rounded-xl shadow p-6 h-fit">
                             <h2 class="text-lg font-bold text-slate-800 mb-2">Manajemen Meja</h2>
                             <p class="text-xs text-slate-400 mb-4">Tambah nomor baru atau hapus instalasi meja restoran.</p>
@@ -219,7 +295,7 @@ $recentMenus = array_slice($recentMenus, 0, 5);
                                 <button type="submit" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg font-bold text-sm"><i class="fas fa-plus"></i> Tambah</button>
                             </form>
 
-                            <div class="overflow-y-auto max-h-[600px] border border-slate-100 rounded-lg divide-y divide-slate-100">
+                            <div class="overflow-y-auto max-h-[400px] border border-slate-100 rounded-lg divide-y divide-slate-100">
                                 <?php foreach($tables as $t): ?>
                                     <div class="p-3 flex justify-between items-center bg-slate-50/50 hover:bg-slate-50 transition">
                                         <div class="flex items-center space-x-3">
@@ -238,6 +314,7 @@ $recentMenus = array_slice($recentMenus, 0, 5);
                             </div>
                         </div>
                     </div>
+
                 <?php elseif ($tab === 'analytics'): ?>
                     <!-- ANALYTICS TAB -->
                     <div class="mb-6 flex space-x-2">
@@ -856,7 +933,45 @@ $recentMenus = array_slice($recentMenus, 0, 5);
             }
         });
     </script>
+<script>
+function filterMenu(category) {
+    const items = document.querySelectorAll('.menu-item');
+    items.forEach(item => {
+        const itemCategory = item.getAttribute('data-category');
+        if (category === 'all' || itemCategory === category) {
+            item.style.setProperty('display', 'flex', 'important');
+        } else {
+            item.style.setProperty('display', 'none', 'important');
+        }
+    });
 
+    // Reset style semua tombol kategori ke default
+    const buttons = document.querySelectorAll('.category-btn');
+    buttons.forEach(btn => {
+        btn.className = "category-btn p-3 rounded-xl font-semibold text-xs flex flex-col items-center justify-center gap-2 transition-all duration-200 bg-white border border-gray-100 text-gray-600 hover:bg-gray-50 cursor-pointer text-center";
+    });
+
+    // Ubah tombol kategori yang aktif menjadi warna orange menyala
+    const activeBtn = document.getElementById(`btn-${category}`);
+    if (activeBtn) {
+        activeBtn.className = "category-btn p-3 rounded-xl font-semibold text-xs flex flex-col items-center justify-center gap-2 transition-all duration-200 bg-orange-50 text-orange-600 border border-orange-100 cursor-pointer text-center";
+    }
+}
+
+function searchMenu() {
+    const input = document.getElementById('search-input').value.toLowerCase();
+    const items = document.querySelectorAll('.menu-item');
+    
+    items.forEach(item => {
+        const name = item.getAttribute('data-name');
+        if (name.includes(input)) {
+            item.style.setProperty('display', 'flex', 'important');
+        } else {
+            item.style.setProperty('display', 'none', 'important');
+        }
+    });
+}
+</script>
     <?php if(isset($_GET['msg'])): ?>
         <script>
             window.addEventListener('DOMContentLoaded', () => {
