@@ -1,9 +1,9 @@
 # 🍽️ RestoMaju - Sistem Pemesanan Restoran
 
 Aplikasi pemesanan restoran berbasis **PHP Native** dan **MariaDB** dengan antarmuka modern menggunakan **Tailwind CSS**. Sistem dibuat modular, mendukung login multi-role, manajemen menu, alur pesanan real-time, dan pembayaran kasir.
+[![Production](https://img.shields.io/badge/Production-Official%20Site-blue?style=for-the-badge&logo=php&logoColor=white)](https://resto.egyadya.site)
 
 ---
-
 ## 🚀 Fitur Utama & Pembagian Peran
 
 Aplikasi memiliki empat role utama yang diatur dengan hak akses terpisah:
@@ -32,7 +32,7 @@ Aplikasi memiliki empat role utama yang diatur dengan hak akses terpisah:
    - Pilih meja siap bayar untuk menampilkan struk pesanan.
    - Hitung subtotal, pajak, diskon, tip, dan total pembayaran.
    - Input uang tunai dan hitung kembalian otomatis.
-   - Cetak struk atau selesaikan transaksi.
+   - Lihat struk atau selesaikan transaksi.
 
 ---
 
@@ -41,41 +41,49 @@ Aplikasi memiliki empat role utama yang diatur dengan hak akses terpisah:
 Berikut struktur file utama dalam repositori:
 
 ```text
-resto/
-├── actions/
-│   ├── admin_action.php
-│   ├── auth.php
-│   ├── cashier_action.php
-│   ├── kitchen_action.php
-│   ├── login_action.php
-│   └── waiter_action.php
-├── assets/
-│   └── css/
-│       ├── input.css
-│       └── style.css
-├── components/
-│   ├── alert.php
-│   ├── head.php
-│   ├── login_form.php
-│   └── page_brand.php
-├── config/
-│   └── db.php
-├── database/
-│   └── restoran-v1.sql
-├── pages/
-│   ├── admin.php
-│   ├── cashier.php
-│   ├── kitchen.php
-│   ├── logout.php
-│   └── waiter.php
-├── index.php
-├── login.php
-└── README.md
+├── 📁 actions
+│   ├── 🐘 admin_action.php
+│   ├── 🐘 auth.php
+│   ├── 🐘 cashier_action.php
+│   ├── 🐘 kitchen_action.php
+│   ├── 🐘 login_action.php
+│   └── 🐘 waiter_action.php
+├── 📁 assets
+│   ├── 📁 css
+│   │   ├── 🎨 input.css
+│   │   └── 🎨 style.css
+│   └── 📁 img
+│       ├── 📁 menu
+│       │   └── 🖼️ default.png
+│       ├── 🖼️ resto-bg.jpg
+│       └── 📄 resto.ico
+├── 📁 components
+│   ├── 🐘 alert.php
+│   ├── 🐘 head.php
+│   ├── 🐘 login_form.php
+│   └── 🐘 page_brand.php
+├── 📁 config
+│   └── 🐘 db.php
+├── 📁 database
+│   ├── 📄 restoran-v1.sql
+│   └── 📄 restoran-v2.sql
+├── 📁 pages
+│   ├── 🐘 admin.php
+│   ├── 🐘 cashier.php
+│   ├── 🐘 kitchen.php
+│   ├── 🐘 logout.php
+│   └── 🐘 waiter.php
+├── ⚙️ .gitignore
+├── 📝 README.md
+├── 🐘 index.php
+├── 🐘 login.php
+├── ⚙️ package-lock.json
+└── ⚙️ package.json
 ```
 
 ---
 
-## ⚙️ Teknologi Utama
+## ⚙️ Teknologi Utama 
 
 - PHP Native
 - MariaDB / MySQL
@@ -88,5 +96,5 @@ resto/
 ## 📌 Catatan
 
 - Pastikan `config/db.php` dikonfigurasi sesuai koneksi database di lingkungan lokal.
-- Import `database/restoran-v1.sql` jika tabel database belum tersedia.
+- Import `database/restoran-v3.sql` jika tabel database belum tersedia.
 - Jalankan aplikasi menggunakan web server lokal seperti XAMPP, MAMP, atau PHP built-in server.
