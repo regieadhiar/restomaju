@@ -161,45 +161,49 @@ $recentMenus = array_slice($recentMenus, 0, 5);
                                     ?>
 
                                     <?php foreach ($byCategory as $catName => $items): ?>
-                                        <h3 class="font-bold text-resto-dark mt-4 mb-2"><?= ucfirst($catName) ?></h3>
-                                        <table class="w-full text-left border-collapse mb-4">
-                                            <thead>
-                                                <tr class="border-b text-slate-400 text-sm font-medium">
-                                                    <th class="pb-3">Foto</th>
-                                                    <th class="pb-3">Nama Menu</th>
-                                                    <th class="pb-3">Harga</th>
-                                                    <th class="pb-3">Status</th>
-                                                    <th class="pb-3 text-center">Aksi</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody class="text-sm font-medium text-slate-700 divide-y divide-slate-100">
-                                                <?php foreach($items as $m): ?>
-                                                    <tr>
-                                                        <td class="py-3"><img src="<?= $m['image'] ?>" class="w-12 h-12 object-cover rounded-lg"></td>
-                                                        <td class="py-3">
-                                                            <span class="font-semibold text-slate-800 block"><?= htmlspecialchars($m['name']) ?></span>
-                                                            <span class="text-xs uppercase tracking-wider text-slate-400"><?= $m['category'] ?></span>
-                                                        </td>
-                                                        <td class="py-3 font-bold text-slate-900">Rp <?= number_format($m['price'] ?? 0, 0, ',', '.') ?></td>
-                                                        <td class="py-3">
-                                                            <span class="px-2.5 py-1 rounded-full text-xs font-bold <?= ($m['status'] ?? '')==='available'?'bg-green-50 text-green-600':'bg-red-50 text-red-600' ?>">
-                                                                <?= ($m['status'] ?? '')==='available'?'Tersedia':'Habis' ?>
-                                                            </span>
-                                                        </td>
-                                                        <td class="py-3 text-center">
-                                                            <div class="flex items-center justify-center space-x-1">
-                                                                <button onclick="openDetailModal(<?= $m['id'] ?>)" class="text-blue-500 w-8 h-8 bg-blue-50 hover:bg-blue-100 rounded-lg" title="Detail Menu"><i class="fas fa-eye"></i></button>
-                                                                <button onclick="openEditModal(<?= $m['id'] ?>)" class="text-amber-500 w-8 h-8 bg-amber-50 hover:bg-amber-100 rounded-lg" title="Edit Menu"><i class="fas fa-edit"></i></button>
-                                                                <form action="?tab=dashboard&action=delete" method="POST" onsubmit="return confirm('Hapus menu ini secara permanen?')" class="inline">
-                                                                    <input type="hidden" name="id" value="<?= $m['id'] ?>">
-                                                                    <button type="submit" class="text-red-500 w-8 h-8 bg-red-50 hover:bg-red-100 rounded-lg" title="Hapus Menu"><i class="fas fa-trash"></i></button>
-                                                                </form>
-                                                            </div>
-                                                        </td>
+                                        <div class="category-group mb-4" data-category-group="<?= htmlspecialchars($catName) ?>">
+                                            <table class="w-full text-left border-collapse">
+                                                <thead>
+                                                    <tr class="border-b text-slate-400 text-sm font-medium">
+                                                        <th class="hidden md:block">Foto</th>
+                                                        <th class="pb-3">Nama Menu</th>
+                                                        <th class="pb-3">Harga</th>
+                                                        <th class="pb-3">Status</th>
+                                                        <th class="pb-3 text-center">Aksi</th>
                                                     </tr>
-                                                <?php endforeach; ?>
-                                            </tbody>    
-                                        </table>
+                                                </thead>
+                                                <tbody class="text-sm font-medium text-slate-700 divide-y divide-slate-100">
+                                                    <?php foreach($items as $m): ?>
+                                                        <tr class="menu-item" data-category="<?= htmlspecialchars($m['category'] ?? 'lainnya') ?>">
+                                                            <td class="hidden md:block py-3"><img src="<?= $m['image'] ?>" class="w-12 h-12 object-cover rounded-lg"></td>
+                                                            <td class="py-3">
+                                                                <span class="font-semibold text-slate-800 block"><?= htmlspecialchars($m['name']) ?></span>
+                                                                <span class="text-xs uppercase tracking-wider text-slate-400"><?= htmlspecialchars($m['category'] ?? 'lainnya') ?></span>
+                                                            </td>
+                                                            <td class="py-3 font-bold text-slate-900">Rp <?= number_format($m['price'] ?? 0, 0, ',', '.') ?></td>
+                                                            <td class="py-3">
+                                                                <span class="sm:hidden inline-flex items-center justify-center w-7 h-7 rounded-full <?= ($m['status'] ?? '') === 'available' ? 'bg-green-50 text-green-600' : 'bg-red-50 text-red-600' ?>">
+                                                                    <i class="fas <?= ($m['status'] ?? '') === 'available' ? 'fa-check' : 'fa-times' ?> text-sm"></i>
+                                                                </span>                                            
+                                                                <span class="hidden sm:inline-block px-2.5 py-1 rounded-full text-xs font-bold <?= ($m['status'] ?? '') === 'available' ? 'bg-green-50 text-green-600' : 'bg-red-50 text-red-600' ?>">
+                                                                    <?= ($m['status'] ?? '') === 'available' ? 'Tersedia' : 'Habis' ?>
+                                                                </span>
+                                                            </td>
+                                                            <td class="py-3 text-center">
+                                                                <div class="flex items-center justify-center space-x-1">
+                                                                    <button onclick="openDetailModal(<?= $m['id'] ?>)" class="text-blue-500 w-8 h-8 bg-blue-50 hover:bg-blue-100 rounded-lg" title="Detail Menu"><i class="fas fa-eye"></i></button>
+                                                                    <button onclick="openEditModal(<?= $m['id'] ?>)" class="text-amber-500 w-8 h-8 bg-amber-50 hover:bg-amber-100 rounded-lg" title="Edit Menu"><i class="fas fa-edit"></i></button>
+                                                                    <form action="?tab=menu&action=delete" method="POST" onsubmit="return confirm('Hapus menu ini secara permanen?')" class="inline">
+                                                                        <input type="hidden" name="id" value="<?= $m['id'] ?>">
+                                                                        <button type="submit" class="text-red-500 w-8 h-8 bg-red-50 hover:bg-red-100 rounded-lg" title="Hapus Menu"><i class="fas fa-trash"></i></button>
+                                                                    </form>
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                    <?php endforeach; ?>
+                                                </tbody>
+                                            </table>
+                                        </div>
                                     <?php endforeach; ?>
                                 <?php endif; ?>
                             </div>
@@ -473,11 +477,10 @@ $recentMenus = array_slice($recentMenus, 0, 5);
                 </div>
                 <div>
                     <label class="text-xs font-bold block mb-1">Role / Jabatan</label>
-                    <select id="edit-user-role" name="role" class="w-full border p-2.5 rounded-lg bg-white focus:ring-2 focus:ring-amber-500">
+                    <select id="edit-user-role" name="role" class="w-full border p-2.5 rounded-lg bg-white focus:ring-2 focus:ring-amber-500 disabled:bg-slate-100 disabled:text-slate-400">
                         <option value="waiter">Pelayan</option>
                         <option value="kitchen">Dapur / Chef</option>
                         <option value="cashier">Kasir</option>
-                        <option value="admin">Admin</option>
                     </select>
                 </div>
                 <div class="flex justify-end space-x-2 border-t pt-3">
@@ -515,24 +518,54 @@ $recentMenus = array_slice($recentMenus, 0, 5);
             fetch('?tab=users&action=get_user&id=' + id)
             .then(res => res.json())
             .then(data => {
-                if(data.error) return alert(data.error);
+            if(data.error) return alert(data.error);
+        
+            // Isi otomatis form edit dengan data user dari database
+            document.getElementById('edit-user-id').value = data.id;
+            document.getElementById('edit-user-username').value = data.username;
+            
+            const roleSelect = document.getElementById('edit-user-role');
+            roleSelect.value = data.role;
+            
+            // CHECK IF USER IS ADMIN
+            if (data.role === 'admin' || data.id == 4) { 
+                roleSelect.disabled = true; // Lock the dropdown
                 
-                // Isi otomatis form edit dengan data user dari database
-                document.getElementById('edit-user-id').value = data.id;
-                document.getElementById('edit-user-username').value = data.username;
-                document.getElementById('edit-user-role').value = data.role;
+                // Create a hidden input so the 'role' value still gets sent to the PHP backend
+                let hiddenRole = document.getElementById('hidden-admin-role');
+                if (!hiddenRole) {
+                    hiddenRole = document.createElement('input');
+                    hiddenRole.type = 'hidden';
+                    hiddenRole.id = 'hidden-admin-role';
+                    hiddenRole.name = 'role';
+                    hiddenRole.value = data.role;
+                    roleSelect.parentNode.appendChild(hiddenRole);
+                }
+            } else {
+                // If it's a regular user, make sure the dropdown is enabled
+                roleSelect.disabled = false;
                 
-                const m = document.getElementById('edit-user-modal');
-                m.classList.remove('hidden'); 
-                m.classList.add('flex');
-            });
-        }
-
+                // Remove the hidden input if it exists from a previous admin edit
+                const hiddenRole = document.getElementById('hidden-admin-role');
+                if (hiddenRole) hiddenRole.remove();
+            }
+            
+            const m = document.getElementById('edit-user-modal');
+            m.classList.remove('hidden'); 
+            m.classList.add('flex');
+        });
+    }
         function filterMenu(cat) {
             document.querySelectorAll('.menu-item').forEach(el => {
-                if(cat === 'all' || el.dataset.category === cat) el.classList.remove('hidden');
+                if (cat === 'all' || el.dataset.category === cat) el.classList.remove('hidden');
                 else el.classList.add('hidden');
             });
+
+            document.querySelectorAll('.category-group').forEach(group => {
+                const visibleRow = group.querySelector('.menu-item:not(.hidden)');
+                group.classList.toggle('hidden', !visibleRow);
+            });
+
             setActiveCategory(cat);
         }
 
