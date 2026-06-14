@@ -49,7 +49,7 @@ $recentMenus = array_slice($recentMenus, 0, 5);
 
                 <div>
                     <div class="flex items-center space-x-3 mb-8">
-                        <div class="w-10 h-10 bg-orange-500 rounded-full flex items-center justify-center text-white"><i class="fas fa-crown"></i></div>
+                        <div class="w-10 h-10 bg-resto-primary rounded-full flex items-center justify-center text-white"><i class="fas fa-crown"></i></div>
                         <div><h2 class="font-bold text-sm">Owner Admin</h2><p class="text-xs text-slate-400">Manajer Restoran</p></div>
                     </div>
                     <nav class="space-y-2">
