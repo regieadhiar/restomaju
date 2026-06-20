@@ -211,7 +211,7 @@ DB_NAME=restomaju_db
 
 1. **Nama Folder Wajib `resto`**
    - Beberapa path dalam aplikasi menggunakan nama folder `resto` secara hardcoded
-   - Jika menggunakan nama berbeda,可能出现错误
+   - Jika menggunakan nama berbeda, maka styling akan tidak terbaca
 
 2. **Konfigurasi Database**
    - Pastikan `config/db.php` membaca file `.env` dengan benar
