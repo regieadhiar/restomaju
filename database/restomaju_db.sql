@@ -1,11 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 5.2.2
+-- version 5.2.3
 -- https://www.phpmyadmin.net/
 --
--- Host: localhost:3306
--- Generation Time: Jun 10, 2026 at 07:57 AM
--- Server version: 8.0.45-cll-lve
--- PHP Version: 8.4.20
+-- Host: 127.0.0.1
+-- Generation Time: Jun 20, 2026 at 12:57 AM
+-- Server version: 12.2.2-MariaDB-log
+-- PHP Version: 8.2.31
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -18,10 +18,24 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Database: `studioeg_restoran`
+-- Database: `restomaju_db`
 --
-CREATE DATABASE IF NOT EXISTS `studioeg_restoran` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci;
-USE `studioeg_restoran`;
+CREATE DATABASE IF NOT EXISTS `restomaju_db` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+USE `restomaju_db`;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `log_harga_menu`
+--
+
+CREATE TABLE `log_harga_menu` (
+  `log_id` int(11) NOT NULL,
+  `menu_id` int(11) DEFAULT NULL,
+  `harga_lama` int(11) DEFAULT NULL,
+  `harga_baru` int(11) DEFAULT NULL,
+  `waktu_perubahan` datetime DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- --------------------------------------------------------
 
@@ -30,13 +44,13 @@ USE `studioeg_restoran`;
 --
 
 CREATE TABLE `menu_items` (
-  `id` int NOT NULL,
-  `name` varchar(100) COLLATE utf8mb4_general_ci NOT NULL,
-  `category` enum('food','drink','snack') COLLATE utf8mb4_general_ci NOT NULL,
-  `price` int NOT NULL,
-  `status` enum('available','unavailable') COLLATE utf8mb4_general_ci DEFAULT 'available',
-  `image` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
-  `description` text COLLATE utf8mb4_general_ci
+  `id` int(11) NOT NULL,
+  `name` varchar(100) NOT NULL,
+  `category` enum('food','drink','snack') NOT NULL,
+  `price` int(11) NOT NULL,
+  `status` enum('available','unavailable') DEFAULT 'available',
+  `image` varchar(255) NOT NULL,
+  `description` text DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -90,10 +104,26 @@ INSERT INTO `menu_items` (`id`, `name`, `category`, `price`, `status`, `image`, 
 (51, 'Gyudon', 'food', 35000, 'available', 'https://juliameals.com/wp-content/uploads/2025/11/9-1-1.png', 'https://juliameals.com/wp-content/uploads/2025/11/9-1-1.png'),
 (52, 'Karaage', 'snack', 25000, 'available', 'https://recipes.net/wp-content/uploads/2021/12/japanese-fried-chicken-tori-karaage-recipe.jpg', 'Ayam goreng khas Jepang yang dimarinasi dengan kecap asin, jahe, dan bawang putih sebelum digoreng renyah.'),
 (53, 'Unagi Don', 'food', 35000, 'available', 'https://www.justonecookbook.com/wp-content/uploads/2021/07/Unadon-Eel-Rice-9592-I-2.jpg', 'Nasi dengan belut panggang yang dilumuri saus manis khas Jepang.'),
-(54, 'Dorayaki', 'snack', 20000, 'available', 'https://www.pyszne.pl/foodwiki/uploads/sites/7/2018/03/dorayaki-2.jpg', 'Kue tradisional Jepang berupa dua lapis pancake lembut yang diisi pasta kacang merah manis.'),
+(54, 'Dorayaki', 'snack', 20000, 'available', 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSHMQIYWhPi7auR___1jJsBQMneadc5jymMIg&s', 'Kue tradisional Jepang berupa dua lapis pancake lembut yang diisi pasta kacang merah manis.'),
 (55, 'Chawanmushi', 'snack', 25000, 'available', 'https://whattocooktoday.com/wp-content/uploads/2011/12/chawanmushi-6.jpg', 'Puding telur gurih yang dikukus dengan tambahan ayam, udang, jamur, dan bahan lainnya.'),
 (56, 'Sukiyaki', 'food', 60000, 'available', 'https://www.justonecookbook.com/wp-content/uploads/2023/01/Sukiyaki-4752-I.jpg', 'Daging sapi, tahu, dan sayuran yang dimasak dalam kuah manis berbahan kecap asin dan gula.'),
 (57, 'Matcha', 'drink', 30000, 'available', 'https://oregonsportsnews.com/wp-content/uploads/2019/09/Matcha.jpg', 'Minuman khas Jepang yang dibuat dari bubuk teh hijau premium (matcha) yang dikocok hingga lembut lalu dipadukan dengan susu segar. Memiliki rasa yang seimbang antara manis, creamy, dan sedikit pahit khas teh hijau, menjadikannya pilihan favorit untuk dinikmati kapan saja.');
+
+--
+-- Triggers `menu_items`
+--
+DELIMITER $$
+CREATE TRIGGER `catat_perubahan_harga` BEFORE UPDATE ON `menu_items` FOR EACH ROW begin
+if old.price <> new.price then
+insert into log_harga_menu
+set menu_id = old.id,
+harga_lama = old.price,
+harga_baru = new.price,
+waktu_perubahan = now();
+end if;
+end
+$$
+DELIMITER ;
 
 -- --------------------------------------------------------
 
@@ -102,14 +132,14 @@ INSERT INTO `menu_items` (`id`, `name`, `category`, `price`, `status`, `image`, 
 --
 
 CREATE TABLE `orders` (
-  `id` int NOT NULL,
-  `table_id` int DEFAULT NULL,
-  `customer_name` varchar(100) COLLATE utf8mb4_general_ci NOT NULL,
-  `total_amount` int DEFAULT '0',
-  `status` enum('pending','ready','paid') COLLATE utf8mb4_general_ci DEFAULT 'pending',
-  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
-  `tip_amount` decimal(10,2) DEFAULT '0.00',
-  `discount_percent` decimal(5,2) DEFAULT '0.00'
+  `id` int(11) NOT NULL,
+  `table_id` int(11) DEFAULT NULL,
+  `customer_name` varchar(100) NOT NULL,
+  `total_amount` int(11) DEFAULT 0,
+  `status` enum('pending','ready','paid') DEFAULT 'pending',
+  `created_at` timestamp NULL DEFAULT current_timestamp(),
+  `tip_amount` decimal(10,2) DEFAULT 0.00,
+  `discount_percent` decimal(5,2) DEFAULT 0.00
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -126,7 +156,36 @@ INSERT INTO `orders` (`id`, `table_id`, `customer_name`, `total_amount`, `status
 (7, 18, 'Diriku', 120000, 'paid', '2026-06-06 01:36:15', 10000.00, 10.00),
 (8, 9, 'Budi', 50000, 'paid', '2026-06-06 07:50:22', 5000.00, 10.00),
 (9, 15, 'Regie', 75000, 'ready', '2026-06-09 07:17:21', 0.00, 0.00),
-(10, 6, 'mamat', 700000, 'paid', '2026-06-09 08:58:30', 10000.00, 10.00);
+(10, 6, 'mamat', 700000, 'paid', '2026-06-09 08:58:30', 10000.00, 10.00),
+(11, 14, 'Mimi', 88000, 'paid', '2026-06-10 05:05:15', 0.00, 0.00),
+(12, 3, 'Regie', 35000, 'pending', '2026-06-11 09:03:14', 0.00, 0.00),
+(13, 4, 'Adhia', 78000, 'pending', '2026-06-12 14:29:00', 0.00, 0.00);
+
+--
+-- Triggers `orders`
+--
+DELIMITER $$
+CREATE TRIGGER `tg_after_order_paid` AFTER UPDATE ON `orders` FOR EACH ROW BEGIN
+    IF NEW.status = 'paid' AND OLD.status != 'paid' THEN
+        UPDATE restaurant_tables 
+        SET status = 'empty', 
+            customer_name = NULL, 
+            order_time = NULL
+        WHERE id = NEW.table_id;
+    END IF;
+END
+$$
+DELIMITER ;
+DELIMITER $$
+CREATE TRIGGER `tg_after_order_placed` AFTER INSERT ON `orders` FOR EACH ROW BEGIN
+    UPDATE restaurant_tables 
+    SET status = 'occupied', 
+        customer_name = NEW.customer_name, 
+        order_time = CURRENT_TIME()
+    WHERE id = NEW.table_id;
+END
+$$
+DELIMITER ;
 
 -- --------------------------------------------------------
 
@@ -135,11 +194,11 @@ INSERT INTO `orders` (`id`, `table_id`, `customer_name`, `total_amount`, `status
 --
 
 CREATE TABLE `order_items` (
-  `id` int NOT NULL,
-  `order_id` int DEFAULT NULL,
-  `menu_id` int DEFAULT NULL,
-  `quantity` int NOT NULL,
-  `price` int NOT NULL
+  `id` int(11) NOT NULL,
+  `order_id` int(11) DEFAULT NULL,
+  `menu_id` int(11) DEFAULT NULL,
+  `quantity` int(11) NOT NULL,
+  `price` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -180,7 +239,27 @@ INSERT INTO `order_items` (`id`, `order_id`, `menu_id`, `quantity`, `price`) VAL
 (32, 10, 35, 2, 150000),
 (33, 10, 13, 1, 25000),
 (34, 10, 14, 1, 22000),
-(35, 10, 57, 1, 30000);
+(35, 10, 57, 1, 30000),
+(36, 11, 1, 1, 25000),
+(37, 11, 2, 1, 35000),
+(38, 11, 4, 1, 8000),
+(39, 11, 8, 1, 20000),
+(40, 12, 2, 1, 35000),
+(41, 13, 1, 1, 25000),
+(42, 13, 2, 1, 35000),
+(43, 13, 7, 1, 18000);
+
+--
+-- Triggers `order_items`
+--
+DELIMITER $$
+CREATE TRIGGER `tg_calculate_total_amount` AFTER INSERT ON `order_items` FOR EACH ROW BEGIN
+    UPDATE orders 
+    SET total_amount = total_amount + (NEW.price * NEW.quantity)
+    WHERE id = NEW.order_id;
+END
+$$
+DELIMITER ;
 
 -- --------------------------------------------------------
 
@@ -189,10 +268,10 @@ INSERT INTO `order_items` (`id`, `order_id`, `menu_id`, `quantity`, `price`) VAL
 --
 
 CREATE TABLE `restaurant_tables` (
-  `id` int NOT NULL,
-  `table_number` varchar(10) COLLATE utf8mb4_general_ci NOT NULL,
-  `status` enum('empty','occupied','ready') COLLATE utf8mb4_general_ci DEFAULT 'empty',
-  `customer_name` varchar(100) COLLATE utf8mb4_general_ci DEFAULT '',
+  `id` int(11) NOT NULL,
+  `table_number` varchar(10) NOT NULL,
+  `status` enum('empty','occupied','ready') DEFAULT 'empty',
+  `customer_name` varchar(100) DEFAULT '',
   `order_time` time DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -203,8 +282,8 @@ CREATE TABLE `restaurant_tables` (
 INSERT INTO `restaurant_tables` (`id`, `table_number`, `status`, `customer_name`, `order_time`) VALUES
 (1, 'Meja 01', 'empty', '', NULL),
 (2, 'Meja 02', 'empty', '', NULL),
-(3, 'Meja 03', 'empty', '', NULL),
-(4, 'Meja 04', 'empty', '', NULL),
+(3, 'Meja 03', 'occupied', 'Regie', '09:03:14'),
+(4, 'Meja 04', 'occupied', 'Adhia', '14:29:00'),
 (5, 'Meja 05', 'empty', '', NULL),
 (6, 'Meja 06', 'empty', '', NULL),
 (7, 'Meja 07', 'empty', '', NULL),
@@ -230,12 +309,12 @@ INSERT INTO `restaurant_tables` (`id`, `table_number`, `status`, `customer_name`
 --
 
 CREATE TABLE `users` (
-  `id` int NOT NULL,
-  `username` varchar(50) COLLATE utf8mb4_general_ci NOT NULL,
-  `password` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
-  `role` enum('waiter','kitchen','cashier','admin') COLLATE utf8mb4_general_ci NOT NULL,
-  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+  `id` int(11) NOT NULL,
+  `username` varchar(50) NOT NULL,
+  `password` varchar(255) NOT NULL,
+  `role` enum('waiter','kitchen','cashier','admin') NOT NULL,
+  `created_at` timestamp NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -248,9 +327,77 @@ INSERT INTO `users` (`id`, `username`, `password`, `role`, `created_at`, `update
 (3, 'kasir', '$2y$10$wrNh47kbS6CavrdnHmMLeug7.utxyQcrrJqjQFkmcDPj4Pe7E7mey', 'cashier', '2026-06-06 01:13:16', '2026-06-06 01:13:16'),
 (4, 'admin', '$2y$10$wrNh47kbS6CavrdnHmMLeug7.utxyQcrrJqjQFkmcDPj4Pe7E7mey', 'admin', '2026-06-06 01:13:16', '2026-06-06 01:13:16');
 
+-- --------------------------------------------------------
+
+--
+-- Stand-in structure for view `view_pesanan_lengkap`
+-- (See below for the actual view)
+--
+CREATE TABLE `view_pesanan_lengkap` (
+`order_id` int(11)
+,`customer_name` varchar(100)
+,`table_number` varchar(10)
+,`menu_name` varchar(100)
+,`category` enum('food','drink','snack')
+,`quantity` int(11)
+,`price_per_item` int(11)
+,`subtotal` bigint(21)
+,`order_status` enum('pending','ready','paid')
+);
+
+-- --------------------------------------------------------
+
+--
+-- Stand-in structure for view `vw_active_billing`
+-- (See below for the actual view)
+--
+CREATE TABLE `vw_active_billing` (
+`table_id` int(11)
+,`table_number` varchar(10)
+,`order_id` int(11)
+,`customer_name` varchar(100)
+,`subtotal` int(11)
+,`order_status` enum('pending','ready','paid')
+);
+
+-- --------------------------------------------------------
+
+--
+-- Stand-in structure for view `vw_admin_analytics`
+-- (See below for the actual view)
+--
+CREATE TABLE `vw_admin_analytics` (
+`category` enum('food','drink','snack')
+,`total_orders` bigint(21)
+,`total_items_sold` decimal(32,0)
+,`gross_revenue` decimal(42,0)
+);
+
+-- --------------------------------------------------------
+
+--
+-- Stand-in structure for view `vw_kitchen_queue`
+-- (See below for the actual view)
+--
+CREATE TABLE `vw_kitchen_queue` (
+`order_id` int(11)
+,`table_number` varchar(10)
+,`customer_name` varchar(100)
+,`menu_name` varchar(100)
+,`quantity` int(11)
+,`order_status` enum('pending','ready','paid')
+,`order_time` timestamp
+);
+
 --
 -- Indexes for dumped tables
 --
+
+--
+-- Indexes for table `log_harga_menu`
+--
+ALTER TABLE `log_harga_menu`
+  ADD PRIMARY KEY (`log_id`);
 
 --
 -- Indexes for table `menu_items`
@@ -292,34 +439,76 @@ ALTER TABLE `users`
 --
 
 --
+-- AUTO_INCREMENT for table `log_harga_menu`
+--
+ALTER TABLE `log_harga_menu`
+  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT for table `menu_items`
 --
 ALTER TABLE `menu_items`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=58;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=59;
 
 --
 -- AUTO_INCREMENT for table `orders`
 --
 ALTER TABLE `orders`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
 
 --
 -- AUTO_INCREMENT for table `order_items`
 --
 ALTER TABLE `order_items`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=36;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=44;
 
 --
 -- AUTO_INCREMENT for table `restaurant_tables`
 --
 ALTER TABLE `restaurant_tables`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
 
 --
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+
+-- --------------------------------------------------------
+
+--
+-- Structure for view `view_pesanan_lengkap`
+--
+DROP TABLE IF EXISTS `view_pesanan_lengkap`;
+
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `view_pesanan_lengkap`  AS SELECT `o`.`id` AS `order_id`, `o`.`customer_name` AS `customer_name`, `rt`.`table_number` AS `table_number`, `m`.`name` AS `menu_name`, `m`.`category` AS `category`, `oi`.`quantity` AS `quantity`, `oi`.`price` AS `price_per_item`, `oi`.`quantity`* `oi`.`price` AS `subtotal`, `o`.`status` AS `order_status` FROM (((`orders` `o` join `restaurant_tables` `rt` on(`o`.`table_id` = `rt`.`id`)) join `order_items` `oi` on(`o`.`id` = `oi`.`order_id`)) join `menu_items` `m` on(`oi`.`menu_id` = `m`.`id`)) ;
+
+-- --------------------------------------------------------
+
+--
+-- Structure for view `vw_active_billing`
+--
+DROP TABLE IF EXISTS `vw_active_billing`;
+
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `vw_active_billing`  AS SELECT `t`.`id` AS `table_id`, `t`.`table_number` AS `table_number`, `o`.`id` AS `order_id`, `o`.`customer_name` AS `customer_name`, `o`.`total_amount` AS `subtotal`, `o`.`status` AS `order_status` FROM (`restaurant_tables` `t` join `orders` `o` on(`t`.`id` = `o`.`table_id`)) WHERE `o`.`status` = 'ready' ;
+
+-- --------------------------------------------------------
+
+--
+-- Structure for view `vw_admin_analytics`
+--
+DROP TABLE IF EXISTS `vw_admin_analytics`;
+
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `vw_admin_analytics`  AS SELECT `mi`.`category` AS `category`, count(distinct `o`.`id`) AS `total_orders`, sum(`oi`.`quantity`) AS `total_items_sold`, sum(`oi`.`quantity` * `oi`.`price`) AS `gross_revenue` FROM ((`orders` `o` join `order_items` `oi` on(`o`.`id` = `oi`.`order_id`)) join `menu_items` `mi` on(`oi`.`menu_id` = `mi`.`id`)) WHERE `o`.`status` = 'paid' GROUP BY `mi`.`category` ;
+
+-- --------------------------------------------------------
+
+--
+-- Structure for view `vw_kitchen_queue`
+--
+DROP TABLE IF EXISTS `vw_kitchen_queue`;
+
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `vw_kitchen_queue`  AS SELECT `o`.`id` AS `order_id`, `t`.`table_number` AS `table_number`, `o`.`customer_name` AS `customer_name`, `mi`.`name` AS `menu_name`, `oi`.`quantity` AS `quantity`, `o`.`status` AS `order_status`, `o`.`created_at` AS `order_time` FROM (((`orders` `o` join `restaurant_tables` `t` on(`o`.`table_id` = `t`.`id`)) join `order_items` `oi` on(`o`.`id` = `oi`.`order_id`)) join `menu_items` `mi` on(`oi`.`menu_id` = `mi`.`id`)) WHERE `o`.`status` = 'pending' ORDER BY `o`.`id` ASC ;
 
 --
 -- Constraints for dumped tables

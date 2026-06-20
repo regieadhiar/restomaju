@@ -5,12 +5,9 @@ if (session_status() === PHP_SESSION_NONE) {
 
 $secrets = [];
 
-// 1. CEK VERSI LOCAL (Laptop / Laragon)
-// Mencari file .env naik 1 level dari folder config (yaitu di folder utama 'restoran')
 $local_env = dirname(__DIR__) . '/.env';
 
 if (file_exists($local_env)) {
-    // Baca file .env teks biasa milik Laragon
     $lines = file($local_env, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
     foreach ($lines as $line) {
         if (strpos(trim($line), '#') === 0) continue; // Lewati komentar
@@ -20,10 +17,8 @@ if (file_exists($local_env)) {
         }
     }
 } 
-// 2. CEK VERSI PRODUCTION (cPanel)
+
 else {
-    // Berdasarkan error log Anda, nama file rahasia Anda adalah .env.resto.php
-    // Kita tulis jalurnya secara murni (MANDIRI) tanpa digabung dengan __DIR__
     $cpanel_secret_path = '/home/studioeg/.env.php';
 
     if (file_exists($cpanel_secret_path)) {
@@ -33,7 +28,7 @@ else {
     }
 }
 
-// 3. EKSTRAK VARIABEL DATABASE
+
 $host     = $secrets['DB_HOST'] ?? 'localhost';
 $username = $secrets['DB_USER'] ?? '';
 $password = $secrets['DB_PASS'] ?? '';
@@ -44,14 +39,12 @@ if (empty($password)) {
 }
 
 try {
-    // Ubah nama variabel dari $pdo menjadi $conn agar sesuai dengan index.php Anda
     $conn = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8mb4", $username, $password);
     $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     
 } catch (PDOException $e) {
     die("Koneksi database gagal: " . $e->getMessage());
 }
-// Fungsi proteksi role halaman
 function checkRole($allowed_role) {
     if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== $allowed_role) {
         header("Location: ../index.php?msg=Akses ditolak! Silakan login kembali.");
@@ -59,7 +52,6 @@ function checkRole($allowed_role) {
     }
 }
 
-// Layout Global Toast Notification HTML komponen
 function renderToast() {
     echo '
     <div id="notification-toast" class="fixed bottom-4 right-4 bg-1e293b text-white p-4 rounded-lg shadow-xl transform translate-y-full transition-transform duration-300 z-50 max-w-sm bg-slate-800">
