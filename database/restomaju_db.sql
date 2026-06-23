@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jun 20, 2026 at 12:57 AM
+-- Generation Time: Jun 23, 2026 at 06:21 AM
 -- Server version: 12.2.2-MariaDB-log
 -- PHP Version: 8.2.31
 
@@ -20,8 +20,54 @@ SET time_zone = "+00:00";
 --
 -- Database: `restomaju_db`
 --
-CREATE DATABASE IF NOT EXISTS `restomaju_db` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
-USE `restomaju_db`;
+
+DELIMITER $$
+--
+-- Procedures
+--
+CREATE DEFINER=`root`@`localhost` PROCEDURE `HapusMenu` (IN `id_menu_param` INT)   begin
+delete from menu_items where id = id_menu_param;
+end$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_add_order_item` (IN `p_order_id` INT, IN `p_menu_id` INT, IN `p_quantity` INT)   BEGIN
+    DECLARE v_price INT;
+    
+    -- Ambil harga menu saat ini
+    SELECT price INTO v_price FROM menu_items WHERE id = p_menu_id;
+    
+    INSERT INTO order_items (order_id, menu_id, quantity, price)
+    VALUES (p_order_id, p_menu_id, p_quantity, v_price);
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_complete_kitchen_order` (IN `p_order_id` INT)   BEGIN
+    DECLARE v_table_id INT;
+    
+    SELECT table_id INTO v_table_id FROM orders WHERE id = p_order_id;
+    
+    -- Update status order
+    UPDATE orders SET status = 'ready' WHERE id = p_order_id;
+    
+    -- Update status meja
+    UPDATE restaurant_tables SET status = 'ready' WHERE id = v_table_id;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_create_order` (IN `p_table_id` INT, IN `p_customer_name` VARCHAR(100), OUT `p_new_order_id` INT)   BEGIN
+    INSERT INTO orders (table_id, customer_name, total_amount, status) 
+    VALUES (p_table_id, p_customer_name, 0, 'pending');
+    
+    SET p_new_order_id = LAST_INSERT_ID();
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_process_payment` (IN `p_table_id` INT, IN `p_tip_amount` INT, IN `p_discount_percent` INT)   BEGIN
+    -- Update order milik meja terkait yang statusnya 'ready'
+    UPDATE orders 
+    SET status = 'paid', 
+        tip_amount = p_tip_amount, 
+        discount_percent = p_discount_percent
+    WHERE table_id = p_table_id AND status = 'ready';
+END$$
+
+DELIMITER ;
 
 -- --------------------------------------------------------
 
@@ -36,6 +82,13 @@ CREATE TABLE `log_harga_menu` (
   `harga_baru` int(11) DEFAULT NULL,
   `waktu_perubahan` datetime DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+--
+-- Dumping data for table `log_harga_menu`
+--
+
+INSERT INTO `log_harga_menu` (`log_id`, `menu_id`, `harga_lama`, `harga_baru`, `waktu_perubahan`) VALUES
+(1, 59, 1, 90, '2026-06-23 12:46:47');
 
 -- --------------------------------------------------------
 
@@ -155,11 +208,12 @@ INSERT INTO `orders` (`id`, `table_id`, `customer_name`, `total_amount`, `status
 (6, 11, 'dia', 25000, 'paid', '2026-06-06 01:31:36', 5000.00, 50.00),
 (7, 18, 'Diriku', 120000, 'paid', '2026-06-06 01:36:15', 10000.00, 10.00),
 (8, 9, 'Budi', 50000, 'paid', '2026-06-06 07:50:22', 5000.00, 10.00),
-(9, 15, 'Regie', 75000, 'ready', '2026-06-09 07:17:21', 0.00, 0.00),
+(9, 15, 'Regie', 75000, 'paid', '2026-06-09 07:17:21', 0.00, 0.00),
 (10, 6, 'mamat', 700000, 'paid', '2026-06-09 08:58:30', 10000.00, 10.00),
 (11, 14, 'Mimi', 88000, 'paid', '2026-06-10 05:05:15', 0.00, 0.00),
-(12, 3, 'Regie', 35000, 'pending', '2026-06-11 09:03:14', 0.00, 0.00),
-(13, 4, 'Adhia', 78000, 'pending', '2026-06-12 14:29:00', 0.00, 0.00);
+(12, 3, 'Regie', 35000, 'paid', '2026-06-11 09:03:14', 0.00, 0.00),
+(13, 4, 'Adhia', 78000, 'ready', '2026-06-12 14:29:00', 0.00, 0.00),
+(14, 9, 'Cecep', 384000, 'pending', '2026-06-23 05:52:32', 0.00, 0.00);
 
 --
 -- Triggers `orders`
@@ -247,7 +301,14 @@ INSERT INTO `order_items` (`id`, `order_id`, `menu_id`, `quantity`, `price`) VAL
 (40, 12, 2, 1, 35000),
 (41, 13, 1, 1, 25000),
 (42, 13, 2, 1, 35000),
-(43, 13, 7, 1, 18000);
+(43, 13, 7, 1, 18000),
+(44, 14, 1, 1, 25000),
+(45, 14, 2, 2, 35000),
+(46, 14, 5, 1, 15000),
+(47, 14, 7, 1, 18000),
+(48, 14, 12, 1, 22000),
+(49, 14, 17, 1, 20000),
+(50, 14, 19, 1, 22000);
 
 --
 -- Triggers `order_items`
@@ -282,19 +343,19 @@ CREATE TABLE `restaurant_tables` (
 INSERT INTO `restaurant_tables` (`id`, `table_number`, `status`, `customer_name`, `order_time`) VALUES
 (1, 'Meja 01', 'empty', '', NULL),
 (2, 'Meja 02', 'empty', '', NULL),
-(3, 'Meja 03', 'occupied', 'Regie', '09:03:14'),
-(4, 'Meja 04', 'occupied', 'Adhia', '14:29:00'),
+(3, 'Meja 03', 'empty', '', NULL),
+(4, 'Meja 04', 'ready', 'Adhia', '14:29:00'),
 (5, 'Meja 05', 'empty', '', NULL),
 (6, 'Meja 06', 'empty', '', NULL),
 (7, 'Meja 07', 'empty', '', NULL),
 (8, 'Meja 08', 'empty', '', NULL),
-(9, 'Meja 09', 'empty', '', NULL),
+(9, 'Meja 09', 'occupied', 'Cecep', '05:52:32'),
 (10, 'Meja 10', 'empty', '', NULL),
 (11, 'Meja 11', 'empty', '', NULL),
 (12, 'Meja 12', 'empty', '', NULL),
 (13, 'Meja 13', 'empty', '', NULL),
 (14, 'Meja 14', 'empty', '', NULL),
-(15, 'Meja 15', 'ready', 'Regie', '07:17:21'),
+(15, 'Meja 15', 'empty', '', NULL),
 (16, 'Meja 16', 'empty', '', NULL),
 (17, 'Meja 17', 'empty', '', NULL),
 (18, 'Meja 18', 'empty', '', NULL),
@@ -442,25 +503,25 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `log_harga_menu`
 --
 ALTER TABLE `log_harga_menu`
-  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `menu_items`
 --
 ALTER TABLE `menu_items`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=59;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=60;
 
 --
 -- AUTO_INCREMENT for table `orders`
 --
 ALTER TABLE `orders`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
 
 --
 -- AUTO_INCREMENT for table `order_items`
 --
 ALTER TABLE `order_items`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=44;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=51;
 
 --
 -- AUTO_INCREMENT for table `restaurant_tables`
