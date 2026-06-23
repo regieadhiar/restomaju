@@ -356,13 +356,13 @@ $recentMenus = array_slice($recentMenus, 0, 5);
                 <h3 class="text-lg font-bold text-slate-800">Tambah Menu Kuliner Baru</h3>
                 <button onclick="closeModal('add-menu-modal')" class="text-slate-400 hover:text-slate-600"><i class="fas fa-times text-xl"></i></button>
             </div>
-            <form action="?tab=dashboard&action=add" method="POST" class="space-y-4">
+            <form action="?tab=dashboard&action=add" method="POST" class="space-y-4" onsubmit="return validateAddMenuForm()">
                 <div class="grid grid-cols-2 gap-4">
                     <div><label class="text-xs font-bold block mb-1">Nama Menu</label><input type="text" name="name" class="w-full border p-2.5 rounded-lg outline-none" required></div>
                     <div><label class="text-xs font-bold block mb-1">Kategori</label><select name="category" class="w-full border p-2.5 rounded-lg bg-white"><option value="food">Makanan</option><option value="drink">Minuman</option><option value="snack">Cemilan</option></select></div>
                 </div>
                 <div class="grid grid-cols-2 gap-4">
-                    <div><label class="text-xs font-bold block mb-1">Harga (Rp)</label><input type="number" name="price" class="w-full border p-2.5 rounded-lg" required></div>
+                    <div><label class="text-xs font-bold block mb-1">Harga (Rp)</label><input type="number" name="price" class="w-full border p-2.5 rounded-lg" min="1" required oninput="this.value = Math.abs(this.value)"></div>
                     <div><label class="text-xs font-bold block mb-1">Status Ketersediaan</label><select name="status" class="w-full border p-2.5 rounded-lg bg-white"><option value="available">Tersedia</option><option value="unavailable">Habis</option></select></div>
                 </div>
                 <div><label class="text-xs font-bold block mb-1">URL Link Foto Menu</label><input type="url" name="image" class="w-full border p-2.5 rounded-lg" placeholder="https://picsum.photos/..."></div>
@@ -381,14 +381,14 @@ $recentMenus = array_slice($recentMenus, 0, 5);
                 <h3 class="text-lg font-bold text-slate-800">Ubah Data Menu Kuliner</h3>
                 <button onclick="closeModal('edit-menu-modal')" class="text-slate-400 hover:text-slate-600"><i class="fas fa-times text-xl"></i></button>
             </div>
-            <form action="?tab=dashboard&action=edit" method="POST" class="space-y-4">
+            <form action="?tab=dashboard&action=edit" method="POST" class="space-y-4" onsubmit="return validateEditMenuForm()">
                 <input type="hidden" id="edit-id" name="id">
                 <div class="grid grid-cols-2 gap-4">
                     <div><label class="text-xs font-bold block mb-1">Nama Menu</label><input type="text" id="edit-name" name="name" class="w-full border p-2.5 rounded-lg outline-none" required></div>
                     <div><label class="text-xs font-bold block mb-1">Kategori</label><select id="edit-category" name="category" class="w-full border p-2.5 rounded-lg bg-white"><option value="food">Makanan</option><option value="drink">Minuman</option><option value="snack">Cemilan</option></select></div>
                 </div>
                 <div class="grid grid-cols-2 gap-4">
-                    <div><label class="text-xs font-bold block mb-1">Harga (Rp)</label><input type="number" id="edit-price" name="price" class="w-full border p-2.5 rounded-lg" required></div>
+                    <div><label class="text-xs font-bold block mb-1">Harga (Rp)</label><input type="number" id="edit-price" name="price" class="w-full border p-2.5 rounded-lg" min="1" required oninput="this.value = Math.abs(this.value)"></div>
                     <div><label class="text-xs font-bold block mb-1">Status Ketersediaan</label><select id="edit-status" name="status" class="w-full border p-2.5 rounded-lg bg-white"><option value="available">Tersedia</option><option value="unavailable">Habis</option></select></div>
                 </div>
                 <div><label class="text-xs font-bold block mb-1">URL Link Foto Menu</label><input type="url" id="edit-image" name="image" class="w-full border p-2.5 rounded-lg"></div>
@@ -631,6 +631,24 @@ $recentMenus = array_slice($recentMenus, 0, 5);
         function closeModal(id) {
             const m = document.getElementById(id);
             m.classList.add('hidden'); m.classList.remove('flex');
+        }
+
+        function validateAddMenuForm() {
+            const price = parseFloat(document.querySelector('input[name="price"]').value) || 0;
+            if (price <= 0) {
+                alert('Harga harus lebih dari 0!');
+                return false;
+            }
+            return true;
+        }
+
+        function validateEditMenuForm() {
+            const price = parseFloat(document.getElementById('edit-price').value) || 0;
+            if (price <= 0) {
+                alert('Harga harus lebih dari 0!');
+                return false;
+            }
+            return true;
         }
 
         function loadAnalytics(period) {

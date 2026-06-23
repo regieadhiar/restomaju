@@ -87,7 +87,7 @@ $tables = $data['tables'];
                             <button type="button" onclick="setTip(0)" class="border p-2 rounded-lg text-sm font-bold hover:bg-slate-100">Tanpa Tip</button>
                             <button type="button" onclick="setTip(5000)" class="border p-2 rounded-lg text-sm font-bold hover:bg-slate-100">Rp 5K</button>
                             <button type="button" onclick="setTip(10000)" class="border p-2 rounded-lg text-sm font-bold hover:bg-slate-100">Rp 10K</button>
-                            <input type="number" id="tip-custom" placeholder="Jumlah lain" class="border p-2 rounded-lg text-sm outline-none focus:ring-2 focus:ring-green-500">
+                            <input type="number" id="tip-custom" placeholder="Jumlah lain" min="0" class="border p-2 rounded-lg text-sm outline-none focus:ring-2 focus:ring-green-500" oninput="this.value = Math.abs(this.value)">
                         </div>
                         <div class="flex justify-between mt-2 text-sm">
                             <span>Tip:</span>
@@ -96,7 +96,7 @@ $tables = $data['tables'];
                     </div>
                 </div>
                 
-                <form action="?action=pay" method="POST" class="border-t pt-4">
+                <form action="?action=pay" method="POST" class="border-t pt-4" onsubmit="return validatePaymentForm()">
                     <input type="hidden" id="inv-table-id" name="table_id">
                     <input type="hidden" id="discount-percent" name="discount_percent" value="0">
                     <input type="hidden" id="tip-amount" name="tip" value="0">
@@ -109,7 +109,7 @@ $tables = $data['tables'];
                     <div class="grid grid-cols-2 gap-4 mb-6">
                         <div>
                             <label class="block text-xs font-bold text-slate-700 mb-1">Uang Tunai Dibayarkan</label>
-                            <input type="number" id="cash-paid" class="w-full border p-3 rounded-lg outline-none focus:ring-2 focus:ring-orange-500 font-bold text-lg" value="0">
+                            <input type="number" id="cash-paid" min="0" class="w-full border p-3 rounded-lg outline-none focus:ring-2 focus:ring-orange-500 font-bold text-lg" value="0" oninput="this.value = Math.abs(this.value)">
                         </div>
                         <div>
                             <label class="block text-xs font-bold text-slate-700 mb-1">Kembalian</label>
@@ -358,6 +358,20 @@ $tables = $data['tables'];
 
         function closeReceiptPopup() {
             document.getElementById('receipt-modal').classList.add('hidden');
+        }
+
+        function validatePaymentForm() {
+            const cashPaid = parseFloat(document.getElementById('cash-paid').value) || 0;
+            const tipCustom = parseFloat(document.getElementById('tip-custom').value) || 0;
+            if (cashPaid < 0) {
+                alert('Jumlah uang tidak boleh negatif!');
+                return false;
+            }
+            if (tipCustom < 0) {
+                alert('Tip tidak boleh negatif!');
+                return false;
+            }
+            return true;
         }
 
         // function printReceiptPdf() {

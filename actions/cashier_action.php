@@ -60,8 +60,8 @@ function handleCashierRequest(PDO $conn): array {
 
     if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_GET['action']) && $_GET['action'] === 'pay') {
         $table_id = intval($_POST['table_id']);
-        $tip = floatval($_POST['tip'] ?? 0);
-        $discount_percent = floatval($_POST['discount_percent'] ?? 0);
+        $tip = max(0, floatval($_POST['tip'] ?? 0));
+        $discount_percent = max(0, min(100, floatval($_POST['discount_percent'] ?? 0)));
         
         try {
             $conn->beginTransaction();

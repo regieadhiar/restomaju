@@ -16,6 +16,10 @@ function handleAdminRequest(PDO $conn): array {
             $name = trim($_POST['name']);
             $cat  = $_POST['category'];
             $prc  = intval($_POST['price']);
+            if ($prc <= 0) {
+                header("Location: admin.php?tab=menu&msg=Harga harus lebih dari 0!&type=error");
+                exit;
+            }
             $sts  = $_POST['status'];
             $dsc  = trim($_POST['description']);
             $img  = !empty($_POST['image']) ? trim($_POST['image']) : 'https://picsum.photos/300/200?random=food';
@@ -31,6 +35,10 @@ function handleAdminRequest(PDO $conn): array {
             $name = trim($_POST['name']);
             $cat  = $_POST['category'];
             $prc  = intval($_POST['price']);
+            if ($prc <= 0) {
+                header("Location: admin.php?tab=menu&msg=Harga harus lebih dari 0!&type=error");
+                exit;
+            }
             $sts  = $_POST['status'];
             $dsc  = trim($_POST['description']);
             $img  = !empty($_POST['image']) ? trim($_POST['image']) : 'https://picsum.photos/300/200?random=food';
