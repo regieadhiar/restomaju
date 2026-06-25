@@ -13,6 +13,8 @@ $occupiedTbl = $data['occupiedTbl'];
 
 $menus = $data['menus'];
 $tables = $data['tables'];
+$discountCodes = $data['discountCodes'];
+$transactions = $data['transactions'];
 
 // Derived statistics for dashboard
 $categoryCounts = [];
@@ -56,6 +58,7 @@ $recentMenus = array_slice($recentMenus, 0, 5);
                         <a href="?tab=dashboard" class="block <?= $tab === 'dashboard' ? 'bg-orange-500 text-white' : 'text-slate-400 hover:text-white' ?> px-4 py-2.5 rounded-lg font-medium"><i class="fas fa-tachometer-alt mr-3"></i>Dashboard</a>
                         <a href="?tab=menu" class="block <?= $tab === 'menu' ? 'bg-orange-500 text-white' : 'text-slate-400 hover:text-white' ?> px-4 py-2.5 rounded-lg font-medium"><i class="fas fa-utensils mr-3"></i>Manajemen Menu</a>
                         <a href="?tab=meja" class="block <?= $tab === 'meja' ? 'bg-orange-500 text-white' : 'text-slate-400 hover:text-white' ?> px-4 py-2.5 rounded-lg font-medium"><i class="fas fa-chair mr-3"></i>Manajemen Meja</a>
+                        <a href="?tab=diskon" class="block <?= $tab === 'diskon' ? 'bg-orange-500 text-white' : 'text-slate-400 hover:text-white' ?> px-4 py-2.5 rounded-lg font-medium"><i class="fas fa-tag mr-3"></i>Manajemen Diskon</a>
                         <a href="?tab=analytics" class="block <?= $tab === 'analytics' ? 'bg-orange-500 text-white' : 'text-slate-400 hover:text-white' ?> px-4 py-2.5 rounded-lg font-medium"><i class="fas fa-chart-bar mr-3"></i>Analitik</a>
                         <a href="?tab=users" class="block <?= $tab === 'users' ? 'bg-orange-500 text-white' : 'text-slate-400 hover:text-white' ?> px-4 py-2.5 rounded-lg font-medium"><i class="fas fa-users mr-3"></i>Manajemen User</a>
                         <a href="logout.php" class="block text-slate-400 hover:text-white px-4 py-2.5 rounded-lg"><i class="fas fa-sign-out-alt mr-3"></i>Keluar</a>
@@ -130,6 +133,98 @@ $recentMenus = array_slice($recentMenus, 0, 5);
                                     <div class="text-slate-400 text-sm">Belum ada menu terbaru.</div>
                                 <?php endif; ?>
                             </div>
+                        </div>
+                    </div>
+
+                    <!-- Transaction History -->
+                    <div class="bg-white rounded-xl shadow p-6">
+                        <h3 class="text-sm font-bold text-slate-800 mb-4"><i class="fas fa-history mr-2 text-orange-500"></i>Riwayat Transaksi Terakhir</h3>
+                        <?php if (!empty($transactions)): ?>
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-left text-sm">
+                                    <thead>
+                                        <tr class="border-b text-slate-400 text-xs font-medium">
+                                            <th class="pb-2">#</th>
+                                            <th class="pb-2">Pelanggan</th>
+                                            <th class="pb-2">Meja</th>
+                                            <th class="pb-2">Item</th>
+                                            <th class="pb-2 text-right">Total</th>
+                                            <th class="pb-2 text-right">Diskon</th>
+                                            <th class="pb-2 text-right">Tip</th>
+                                            <th class="pb-2">Waktu</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="text-slate-600 divide-y divide-slate-100">
+                                        <?php foreach($transactions as $tx): ?>
+                                            <tr class="hover:bg-slate-50">
+                                                <td class="py-2 font-semibold text-slate-800">#<?= $tx['id'] ?></td>
+                                                <td class="py-2"><?= htmlspecialchars($tx['customer_name']) ?></td>
+                                                <td class="py-2"><?= htmlspecialchars($tx['table_number']) ?></td>
+                                                <td class="py-2 text-xs text-slate-500 max-w-[200px] truncate" title="<?= htmlspecialchars($tx['items_summary']) ?>"><?= htmlspecialchars($tx['items_summary']) ?></td>
+                                                <td class="py-2 text-right font-bold text-slate-800">Rp <?= number_format($tx['total_amount'], 0, ',', '.') ?></td>
+                                                <td class="py-2 text-right <?= $tx['discount_percent'] > 0 ? 'text-red-500 font-semibold' : 'text-slate-400' ?>"><?= $tx['discount_percent'] > 0 ? $tx['discount_percent'].'%' : '-' ?></td>
+                                                <td class="py-2 text-right <?= $tx['tip_amount'] > 0 ? 'text-green-600 font-semibold' : 'text-slate-400' ?>"><?= $tx['tip_amount'] > 0 ? 'Rp '.number_format($tx['tip_amount'],0,',','.') : '-' ?></td>
+                                                <td class="py-2 text-xs text-slate-400"><?= date('d M H:i', strtotime($tx['created_at'])) ?></td>
+                                            </tr>
+                                        <?php endforeach; ?>
+                                    </tbody>
+                                </table>
+                            </div>
+                        <?php else: ?>
+                            <div class="text-slate-400 text-sm text-center py-6">Belum ada riwayat transaksi.</div>
+                        <?php endif; ?>
+                    </div>
+
+                <?php elseif ($tab === 'diskon'): ?>
+                    <!-- DISCOUNT MANAGEMENT TAB -->
+                    <div class="bg-white rounded-xl shadow p-6">
+                        <div class="flex justify-between items-center mb-6">
+                            <div>
+                                <h2 class="text-lg font-bold text-resto-dark">Manajemen Kode Diskon</h2>
+                                <p class="text-xs text-slate-400 mt-1">Kelola kode diskon yang digunakan di kasir.</p>
+                            </div>
+                            <button onclick="openAddDiscountModal()" class="bg-resto-primary text-white px-4 py-2 rounded-lg font-bold hover:bg-orange-600 transition text-sm"><i class="fas fa-plus"></i><span class="hidden md:inline ml-2">Tambah Diskon</span></button>
+                        </div>
+
+                        <div class="overflow-x-auto">
+                            <?php if (empty($discountCodes)): ?>
+                                <div class="text-slate-400 text-center py-8">Belum ada kode diskon.</div>
+                            <?php else: ?>
+                                <table class="w-full text-left border-collapse">
+                                    <thead>
+                                        <tr class="border-b text-slate-400 text-sm font-medium">
+                                            <th class="pb-3">Kode</th>
+                                            <th class="pb-3">Diskon</th>
+                                            <th class="pb-3">Status</th>
+                                            <th class="pb-3">Dibuat</th>
+                                            <th class="pb-3 text-center">Aksi</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="text-sm font-medium text-slate-700 divide-y divide-slate-100">
+                                        <?php foreach($discountCodes as $dc): ?>
+                                            <tr>
+                                                <td class="py-3 font-bold text-slate-800"><?= htmlspecialchars($dc['code']) ?></td>
+                                                <td class="py-3 font-bold text-orange-500"><?= $dc['discount_percent'] ?>%</td>
+                                                <td class="py-3">
+                                                    <span class="px-2.5 py-1 rounded-full text-xs font-bold <?= $dc['is_active'] ? 'bg-green-50 text-green-600' : 'bg-red-50 text-red-600' ?>">
+                                                        <?= $dc['is_active'] ? 'Aktif' : 'Nonaktif' ?>
+                                                    </span>
+                                                </td>
+                                                <td class="py-3 text-slate-500 text-xs"><?= date('d M Y', strtotime($dc['created_at'])) ?></td>
+                                                <td class="py-3 text-center">
+                                                    <div class="flex items-center justify-center space-x-1">
+                                                        <button onclick="openEditDiscountModal(<?= $dc['id'] ?>)" class="text-amber-500 w-8 h-8 bg-amber-50 hover:bg-amber-100 rounded-lg" title="Edit"><i class="fas fa-edit"></i></button>
+                                                        <form action="?tab=diskon&action=delete_discount" method="POST" onsubmit="return confirm('Hapus kode diskon ini?')" class="inline">
+                                                            <input type="hidden" name="id" value="<?= $dc['id'] ?>">
+                                                            <button type="submit" class="text-red-500 w-8 h-8 bg-red-50 hover:bg-red-100 rounded-lg" title="Hapus"><i class="fas fa-trash"></i></button>
+                                                        </form>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        <?php endforeach; ?>
+                                    </tbody>
+                                </table>
+                            <?php endif; ?>
                         </div>
                     </div>
 
@@ -491,6 +586,59 @@ $recentMenus = array_slice($recentMenus, 0, 5);
         </div>
     </div>
 
+    <!-- Add Discount Modal -->
+    <div id="add-discount-modal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-2xl w-full max-w-md p-6">
+            <div class="flex justify-between items-center border-b pb-3 mb-4">
+                <h3 class="text-lg font-bold text-slate-800">Tambah Kode Diskon Baru</h3>
+                <button onclick="closeModal('add-discount-modal')" class="text-slate-400 hover:text-slate-600"><i class="fas fa-times text-xl"></i></button>
+            </div>
+            <form action="?tab=diskon&action=add_discount" method="POST" class="space-y-4">
+                <div>
+                    <label class="text-xs font-bold block mb-1">Kode Diskon</label>
+                    <input type="text" name="code" class="w-full border p-2.5 rounded-lg outline-none uppercase" placeholder="Contoh: PROMO10" required>
+                </div>
+                <div>
+                    <label class="text-xs font-bold block mb-1">Persentase Diskon (%)</label>
+                    <input type="number" name="discount_percent" class="w-full border p-2.5 rounded-lg" min="1" max="100" required placeholder="10">
+                </div>
+                <div class="flex justify-end space-x-2 border-t pt-3">
+                    <button type="button" onclick="closeModal('add-discount-modal')" class="border px-4 py-2 rounded-lg font-bold text-sm">Batal</button>
+                    <button type="submit" class="bg-orange-500 text-white px-4 py-2 rounded-lg font-bold text-sm">Simpan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Edit Discount Modal -->
+    <div id="edit-discount-modal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-2xl w-full max-w-md p-6">
+            <div class="flex justify-between items-center border-b pb-3 mb-4">
+                <h3 class="text-lg font-bold text-slate-800">Edit Kode Diskon</h3>
+                <button onclick="closeModal('edit-discount-modal')" class="text-slate-400 hover:text-slate-600"><i class="fas fa-times text-xl"></i></button>
+            </div>
+            <form action="?tab=diskon&action=edit_discount" method="POST" class="space-y-4">
+                <input type="hidden" id="edit-discount-id" name="id">
+                <div>
+                    <label class="text-xs font-bold block mb-1">Kode Diskon</label>
+                    <input type="text" id="edit-discount-code" name="code" class="w-full border p-2.5 rounded-lg outline-none uppercase" required>
+                </div>
+                <div>
+                    <label class="text-xs font-bold block mb-1">Persentase Diskon (%)</label>
+                    <input type="number" id="edit-discount-percent" name="discount_percent" class="w-full border p-2.5 rounded-lg" min="1" max="100" required>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <input type="checkbox" id="edit-discount-active" name="is_active" class="w-4 h-4 rounded" checked>
+                    <label for="edit-discount-active" class="text-sm font-bold">Aktif</label>
+                </div>
+                <div class="flex justify-end space-x-2 border-t pt-3">
+                    <button type="button" onclick="closeModal('edit-discount-modal')" class="border px-4 py-2 rounded-lg font-bold text-sm">Batal</button>
+                    <button type="submit" class="bg-amber-500 text-white px-4 py-2 rounded-lg font-bold text-sm">Perbarui</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <?php renderToast(); ?>
 
     <script src="https://www.gstatic.com/charts/loader.js"></script>
@@ -649,6 +797,25 @@ $recentMenus = array_slice($recentMenus, 0, 5);
                 return false;
             }
             return true;
+        }
+
+        function openAddDiscountModal() {
+            document.getElementById('add-discount-modal').classList.remove('hidden');
+            document.getElementById('add-discount-modal').classList.add('flex');
+        }
+
+        function openEditDiscountModal(id) {
+            fetch('?tab=diskon&action=get_discount&id=' + id)
+            .then(res => res.json())
+            .then(data => {
+                if(data.error) return alert(data.error);
+                document.getElementById('edit-discount-id').value = data.id;
+                document.getElementById('edit-discount-code').value = data.code;
+                document.getElementById('edit-discount-percent').value = data.discount_percent;
+                document.getElementById('edit-discount-active').checked = data.is_active == 1;
+                const m = document.getElementById('edit-discount-modal');
+                m.classList.remove('hidden'); m.classList.add('flex');
+            });
         }
 
         function loadAnalytics(period) {

@@ -18,8 +18,9 @@ function handleWaiterRequest(PDO $conn): array {
                 $total += $item['price'] * $item['qty'];
             }
 
-            $stmtOrder = $conn->prepare("INSERT INTO orders (table_id, customer_name, total_amount, status) VALUES (?, ?, ?, 'pending')");
-            $stmtOrder->execute([$input['table_id'], $input['customer_name'], $total]);
+            $notes = !empty($input['notes']) ? $input['notes'] : null;
+            $stmtOrder = $conn->prepare("INSERT INTO orders (table_id, customer_name, total_amount, status, notes) VALUES (?, ?, ?, 'pending', ?)");
+            $stmtOrder->execute([$input['table_id'], $input['customer_name'], $total, $notes]);
             $order_id = $conn->lastInsertId();
 
             $stmtItem = $conn->prepare("INSERT INTO order_items (order_id, menu_id, quantity, price) VALUES (?, ?, ?, ?)");

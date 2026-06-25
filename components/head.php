@@ -2,9 +2,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= htmlspecialchars($pageTitle ?? 'RestoMaju') ?></title>
-    <link rel="shortcut icon" href="/resto/assets/img/resto.ico" type="image/x-icon">
+    <link rel="shortcut icon" href="/restomaju/assets/img/resto.ico" type="image/x-icon">
     <!-- <script src="https://cdn.tailwindcss.com"></script> -->
-    <link rel="stylesheet" href="/resto/assets/css/style.css">
+    <link rel="stylesheet" href="/restomaju/assets/css/style.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">

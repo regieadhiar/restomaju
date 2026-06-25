@@ -131,18 +131,7 @@ git clone https://github.com/regieadhiar/TB-PraktikumBasisData.git
 # ATAU download ZIP dan extract
 ```
 
-#### 2. ⚠️ Ubah Nama Folder
-
-**PENTING:** Setelah download/clone, ubah nama folder project menjadi `resto`.
-
-```
-Nama lama: TB-PraktikumBasisData
-Nama baru: resto
-```
-
-Path lengkap: `C:/xampp/htdocs/resto` (Windows) atau `/Applications/XAMPP/htdocs/resto` (macOS)
-
-#### 3. Buat Database
+#### 2. Buat Database
 
 1. Buka phpMyAdmin (`http://localhost/phpmyadmin`)
 2. Klik **New** → Buat database baru
@@ -150,14 +139,14 @@ Path lengkap: `C:/xampp/htdocs/resto` (Windows) atau `/Applications/XAMPP/htdocs
 4. Pilih collation: `utf8mb4_unicode_ci`
 5. Klik **Create**
 
-#### 4. Import Database
+#### 3. Import Database
 
 1. Pilih database `restomaju_db` yang baru dibuat
 2. Klik tab **Import**
 3. Pilih file `database/restomaju_db.sql`
 4. Klik **Go** / **Import**
 
-#### 5. Konfigurasi Environment
+#### 4. Konfigurasi Environment
 
 Salin file `.env.example` menjadi `.env`:
 
@@ -183,18 +172,18 @@ DB_NAME=restomaju_db
 
 > **Catatan:** Untuk XAMPP default, `DB_USER=root` dan `DB_PASS` kosong. Jika menggunakan password, isi sesuai.
 
-#### 6. Jalankan Aplikasi
+#### 5. Jalankan Aplikasi
 
 **XAMPP / MAMP / Laragon**
-1. Pindahkan folder `resto` ke direktori web server:
-   - Windows: `C:/xampp/htdocs/resto`
-   - macOS: `/Applications/XAMPP/htdocs/resto`
-   - Linux: `/var/www/html/resto`
+1. Pindahkan folder `restomaju` ke direktori web server:
+   - Windows: `C:/xampp/htdocs/restomaju`
+   - macOS: `/Applications/XAMPP/htdocs/restomaju`
+   - Linux: `/var/www/html/restomaju`
 2. Start Apache & MySQL
-3. Buka browser: `http://localhost/resto`
+3. Buka browser: `http://localhost/restomaju`
 
 
-#### 7. Login Default
+#### 6. Login Default
 
 | Role | Username | Password |
 |------|----------|----------|
@@ -209,15 +198,11 @@ DB_NAME=restomaju_db
 
 ## 📌 Catatan Penting
 
-1. **Nama Folder Wajib `resto`**
-   - Beberapa path dalam aplikasi menggunakan nama folder `resto` secara hardcoded
-   - Jika menggunakan nama berbeda, maka styling akan tidak terbaca
-
-2. **Konfigurasi Database**
+1. **Konfigurasi Database**
    - Pastikan `config/db.php` membaca file `.env` dengan benar
    - Verifikasi kredensial database sesuai environment lokal
 
-3. **Tailwind CSS**
+2. **Tailwind CSS**
    - File CSS sudah di-build di `assets/css/style.css`
    - Jika ingin modifikasi styling, edit `assets/css/input.css` lalu rebuild:
    ```bash
@@ -225,7 +210,7 @@ DB_NAME=restomaju_db
    npx tailwindcss -i ./assets/css/input.css -o ./assets/css/style.css
    ```
 
-4. **Screenshot Aplikasi**
+3. **Screenshot Aplikasi**
    - Lihat [`preview.md`](preview.md) untuk kumpulan screenshot seluruh tampilan aplikasi
 
 ---

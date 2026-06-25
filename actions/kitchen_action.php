@@ -27,7 +27,21 @@ function handleKitchenRequest(PDO $conn): array {
         exit;
     }
 
+    // Toggle menu availability
+    if (isset($_GET['action']) && $_GET['action'] === 'toggle_menu' && isset($_GET['id'])) {
+        $menu_id = intval($_GET['id']);
+        $stmt = $conn->prepare("SELECT status FROM menu_items WHERE id = ?");
+        $stmt->execute([$menu_id]);
+        $current = $stmt->fetchColumn();
+        $newStatus = ($current === 'available') ? 'unavailable' : 'available';
+        $upd = $conn->prepare("UPDATE menu_items SET status = ? WHERE id = ?");
+        $upd->execute([$newStatus, $menu_id]);
+        header("Location: kitchen.php?msg=Status menu diperbarui!");
+        exit;
+    }
+
     return [
-        'orders' => $conn->query("SELECT o.*, t.table_number FROM orders o JOIN restaurant_tables t ON o.table_id = t.id WHERE o.status = 'pending' ORDER BY o.id ASC")->fetchAll(PDO::FETCH_ASSOC)
+        'orders' => $conn->query("SELECT o.*, t.table_number FROM orders o JOIN restaurant_tables t ON o.table_id = t.id WHERE o.status = 'pending' ORDER BY o.id ASC")->fetchAll(PDO::FETCH_ASSOC),
+        'menus' => $conn->query("SELECT id, name, category, price, status FROM menu_items ORDER BY category, name")->fetchAll(PDO::FETCH_ASSOC)
     ];
 }

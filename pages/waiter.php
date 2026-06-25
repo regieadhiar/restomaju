@@ -86,6 +86,10 @@ $menuQuery = $data['menuQuery'];
                             </div>
 
                             <div class="border-t pt-6">
+                                <div class="mb-4">
+                                    <label class="block text-sm font-medium text-resto-dark mb-2"><i class="fas fa-sticky-note mr-1 text-orange-400"></i>Catatan Pesanan</label>
+                                    <textarea id="order-notes" rows="2" class="w-full px-3 py-2 border border-resto-gray/30 rounded-lg outline-none text-sm resize-none" placeholder="Contoh: Pedas, Tanpa bawang, dll."></textarea>
+                                </div>
                                 <div class="flex justify-between items-center mb-4">
                                     <span class="text-lg font-semibold text-resto-dark">Total :</span>
                                     <span id="cart-total" class="text-2xl font-bold text-resto-primary">Rp 0</span>
@@ -205,6 +209,7 @@ $menuQuery = $data['menuQuery'];
             const payload = {
                 table_id: document.getElementById('table-select').value,
                 customer_name: document.getElementById('customer-name').value,
+                notes: document.getElementById('order-notes').value.trim(),
                 cart: cart
             };
             fetch('?action=place_order', {

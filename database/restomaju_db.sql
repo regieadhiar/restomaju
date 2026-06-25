@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jun 23, 2026 at 06:21 AM
+-- Generation Time: Jun 25, 2026 at 03:54 AM
 -- Server version: 12.2.2-MariaDB-log
 -- PHP Version: 8.2.31
 
@@ -20,54 +20,34 @@ SET time_zone = "+00:00";
 --
 -- Database: `restomaju_db`
 --
+CREATE DATABASE IF NOT EXISTS `restomaju_db` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+USE `restomaju_db`;
 
-DELIMITER $$
+-- --------------------------------------------------------
+
 --
--- Procedures
+-- Table structure for table `discount_codes`
 --
-CREATE DEFINER=`root`@`localhost` PROCEDURE `HapusMenu` (IN `id_menu_param` INT)   begin
-delete from menu_items where id = id_menu_param;
-end$$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_add_order_item` (IN `p_order_id` INT, IN `p_menu_id` INT, IN `p_quantity` INT)   BEGIN
-    DECLARE v_price INT;
-    
-    -- Ambil harga menu saat ini
-    SELECT price INTO v_price FROM menu_items WHERE id = p_menu_id;
-    
-    INSERT INTO order_items (order_id, menu_id, quantity, price)
-    VALUES (p_order_id, p_menu_id, p_quantity, v_price);
-END$$
+CREATE TABLE `discount_codes` (
+  `id` int(11) NOT NULL,
+  `code` varchar(50) NOT NULL,
+  `discount_percent` decimal(5,2) NOT NULL,
+  `is_active` tinyint(1) DEFAULT 1,
+  `created_at` timestamp NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_complete_kitchen_order` (IN `p_order_id` INT)   BEGIN
-    DECLARE v_table_id INT;
-    
-    SELECT table_id INTO v_table_id FROM orders WHERE id = p_order_id;
-    
-    -- Update status order
-    UPDATE orders SET status = 'ready' WHERE id = p_order_id;
-    
-    -- Update status meja
-    UPDATE restaurant_tables SET status = 'ready' WHERE id = v_table_id;
-END$$
+--
+-- Dumping data for table `discount_codes`
+--
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_create_order` (IN `p_table_id` INT, IN `p_customer_name` VARCHAR(100), OUT `p_new_order_id` INT)   BEGIN
-    INSERT INTO orders (table_id, customer_name, total_amount, status) 
-    VALUES (p_table_id, p_customer_name, 0, 'pending');
-    
-    SET p_new_order_id = LAST_INSERT_ID();
-END$$
-
-CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_process_payment` (IN `p_table_id` INT, IN `p_tip_amount` INT, IN `p_discount_percent` INT)   BEGIN
-    -- Update order milik meja terkait yang statusnya 'ready'
-    UPDATE orders 
-    SET status = 'paid', 
-        tip_amount = p_tip_amount, 
-        discount_percent = p_discount_percent
-    WHERE table_id = p_table_id AND status = 'ready';
-END$$
-
-DELIMITER ;
+INSERT INTO `discount_codes` (`id`, `code`, `discount_percent`, `is_active`, `created_at`) VALUES
+(1, 'DISKON10', 10.00, 1, '2026-06-25 03:31:50'),
+(2, 'DISKON15', 15.00, 1, '2026-06-25 03:31:50'),
+(3, 'DISKON20', 20.00, 1, '2026-06-25 03:31:50'),
+(4, 'HARBOLNAS', 25.00, 1, '2026-06-25 03:31:50'),
+(5, 'PROMO50', 50.00, 1, '2026-06-25 03:31:50'),
+(6, 'OP', 80.00, 1, '2026-06-25 03:52:16');
 
 -- --------------------------------------------------------
 
@@ -144,7 +124,7 @@ INSERT INTO `menu_items` (`id`, `name`, `category`, `price`, `status`, `image`, 
 (35, 'sahsimi flat', 'food', 150000, 'available', 'https://a.cdn-hotels.com/gdcs/production195/d1631/8f7586ab-5509-4c30-9100-ab9a903d6dad.jpg?impolicy=fcrop&w=1600&h=1066&q=medium', ''),
 (36, 'odeng sup', 'food', 35000, 'available', 'https://i.pinimg.com/originals/28/21/e0/2821e0b5d0ec0d9d862e728de6711db9.jpg', ''),
 (37, 'steak butter', 'food', 100000, 'available', 'https://easylowcarb.com/wp-content/uploads/2023/06/Grilled-Sirloin-Steak-EasyLowCarb-6.jpg', ''),
-(38, 'shusi slash', 'food', 140000, 'available', 'https://yujinizakaya.com.sg/wp-content/uploads/2025/06/japanese-nigiri-sushi-recipe-1749130962.jpg', 'Hidangan khas Jepang berupa nasi yang dibumbui cuka dan dipadukan dengan ikan segar, seafood, atau sayuran.'),
+(38, 'shusi slash', 'food', 140000, 'available', 'https://png.pngtree.com/png-clipart/20220125/original/pngtree-sushi-slash-png-image_7223043.png', 'Hidangan khas Jepang berupa nasi yang dibumbui cuka dan dipadukan dengan ikan segar, seafood, atau sayuran.'),
 (39, 'ramen', 'food', 25000, 'available', 'https://images5.alphacoders.com/132/1322094.png', 'Mi Jepang yang disajikan dalam kuah kaldu gurih dengan topping seperti telur, daging chashu, dan daun bawang.'),
 (40, 'tempura tepung', 'snack', 25000, 'available', 'https://d3nrav7vo3lya8.cloudfront.net/categories/tempura/veg-tempura.webp', 'Udang atau sayuran yang dibalut adonan ringan lalu digoreng hingga renyah.'),
 (41, 'takoyaki', 'snack', 20000, 'available', 'https://www.theforkbite.com/wp-content/uploads/2021/01/Takoyaki-balls-featured-1.11.21.jpg', 'Bola-bola tepung berisi potongan gurita yang dimasak dalam cetakan khusus dan diberi saus khas Jepang.'),
@@ -155,7 +135,7 @@ INSERT INTO `menu_items` (`id`, `name`, `category`, `price`, `status`, `image`, 
 (49, 'Tonkatsu', 'food', 50000, 'available', 'https://fryit.co/wp-content/uploads/2023/08/air-fryer-tonkatsu_rcpimg.jpg', 'Daging babi atau ayam yang dilapisi tepung roti dan digoreng hingga keemasan, disajikan dengan saus tonkatsu khas Jepang.'),
 (50, 'Okonomiyaki', 'snack', 25000, 'available', 'https://i0.wp.com/fullofplants.com/wp-content/uploads/2017/10/the-best-vegan-okonomiyaki-gluten-free-with-jackfruit-thumb-3.jpg?fit=1400%2C1400&ssl=1', 'Pancake gurih khas Jepang yang terbuat dari adonan tepung, kol, dan berbagai topping seperti seafood atau daging.'),
 (51, 'Gyudon', 'food', 35000, 'available', 'https://juliameals.com/wp-content/uploads/2025/11/9-1-1.png', 'https://juliameals.com/wp-content/uploads/2025/11/9-1-1.png'),
-(52, 'Karaage', 'snack', 25000, 'available', 'https://recipes.net/wp-content/uploads/2021/12/japanese-fried-chicken-tori-karaage-recipe.jpg', 'Ayam goreng khas Jepang yang dimarinasi dengan kecap asin, jahe, dan bawang putih sebelum digoreng renyah.'),
+(52, 'Karaage', 'snack', 25000, 'available', 'https://twoplaidaprons.com/wp-content/uploads/2023/06/karaage-chicken-on-plate-with-dipping-sauce-thumbnail-shot.jpg', 'Ayam goreng khas Jepang yang dimarinasi dengan kecap asin, jahe, dan bawang putih sebelum digoreng renyah.'),
 (53, 'Unagi Don', 'food', 35000, 'available', 'https://www.justonecookbook.com/wp-content/uploads/2021/07/Unadon-Eel-Rice-9592-I-2.jpg', 'Nasi dengan belut panggang yang dilumuri saus manis khas Jepang.'),
 (54, 'Dorayaki', 'snack', 20000, 'available', 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSHMQIYWhPi7auR___1jJsBQMneadc5jymMIg&s', 'Kue tradisional Jepang berupa dua lapis pancake lembut yang diisi pasta kacang merah manis.'),
 (55, 'Chawanmushi', 'snack', 25000, 'available', 'https://whattocooktoday.com/wp-content/uploads/2011/12/chawanmushi-6.jpg', 'Puding telur gurih yang dikukus dengan tambahan ayam, udang, jamur, dan bahan lainnya.'),
@@ -192,28 +172,32 @@ CREATE TABLE `orders` (
   `status` enum('pending','ready','paid') DEFAULT 'pending',
   `created_at` timestamp NULL DEFAULT current_timestamp(),
   `tip_amount` decimal(10,2) DEFAULT 0.00,
-  `discount_percent` decimal(5,2) DEFAULT 0.00
+  `discount_percent` decimal(5,2) DEFAULT 0.00,
+  `notes` text DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `orders`
 --
 
-INSERT INTO `orders` (`id`, `table_id`, `customer_name`, `total_amount`, `status`, `created_at`, `tip_amount`, `discount_percent`) VALUES
-(1, 5, 'if', 25000, 'paid', '2026-06-02 01:34:43', 0.00, 0.00),
-(2, 14, 'tukang bom', 5000, 'paid', '2026-06-02 01:39:37', 0.00, 0.00),
-(3, 6, 'ba', 93000, 'paid', '2026-06-04 09:04:37', 0.00, 0.00),
-(4, 7, 'me', 30000, 'paid', '2026-06-06 00:56:57', 0.00, 0.00),
-(5, 6, 'aku', 237000, 'paid', '2026-06-06 01:26:36', 10000.00, 10.00),
-(6, 11, 'dia', 25000, 'paid', '2026-06-06 01:31:36', 5000.00, 50.00),
-(7, 18, 'Diriku', 120000, 'paid', '2026-06-06 01:36:15', 10000.00, 10.00),
-(8, 9, 'Budi', 50000, 'paid', '2026-06-06 07:50:22', 5000.00, 10.00),
-(9, 15, 'Regie', 75000, 'paid', '2026-06-09 07:17:21', 0.00, 0.00),
-(10, 6, 'mamat', 700000, 'paid', '2026-06-09 08:58:30', 10000.00, 10.00),
-(11, 14, 'Mimi', 88000, 'paid', '2026-06-10 05:05:15', 0.00, 0.00),
-(12, 3, 'Regie', 35000, 'paid', '2026-06-11 09:03:14', 0.00, 0.00),
-(13, 4, 'Adhia', 78000, 'ready', '2026-06-12 14:29:00', 0.00, 0.00),
-(14, 9, 'Cecep', 384000, 'pending', '2026-06-23 05:52:32', 0.00, 0.00);
+INSERT INTO `orders` (`id`, `table_id`, `customer_name`, `total_amount`, `status`, `created_at`, `tip_amount`, `discount_percent`, `notes`) VALUES
+(1, 5, 'if', 25000, 'paid', '2026-06-02 01:34:43', 0.00, 0.00, NULL),
+(3, 6, 'ba', 93000, 'paid', '2026-06-04 09:04:37', 0.00, 0.00, NULL),
+(4, 7, 'me', 30000, 'paid', '2026-06-06 00:56:57', 0.00, 0.00, NULL),
+(5, 6, 'aku', 237000, 'paid', '2026-06-06 01:26:36', 10000.00, 10.00, NULL),
+(6, 11, 'dia', 25000, 'paid', '2026-06-06 01:31:36', 5000.00, 50.00, NULL),
+(7, 18, 'Diriku', 120000, 'paid', '2026-06-06 01:36:15', 10000.00, 10.00, NULL),
+(8, 9, 'Budi', 50000, 'paid', '2026-06-06 07:50:22', 5000.00, 10.00, NULL),
+(9, 15, 'Regie', 75000, 'paid', '2026-06-09 07:17:21', 0.00, 0.00, NULL),
+(10, 6, 'mamat', 700000, 'paid', '2026-06-09 08:58:30', 10000.00, 10.00, NULL),
+(11, 14, 'Mimi', 88000, 'paid', '2026-06-10 05:05:15', 0.00, 0.00, NULL),
+(12, 3, 'Regie', 35000, 'paid', '2026-06-11 09:03:14', 0.00, 0.00, NULL),
+(13, 4, 'Adhia', 78000, 'paid', '2026-06-12 14:29:00', 0.00, 0.00, NULL),
+(14, 9, 'Cecep', 384000, 'pending', '2026-06-23 05:52:32', 0.00, 0.00, NULL),
+(15, 14, 'Rafli', 96000, 'paid', '2026-06-23 08:57:51', 10000.00, 10.00, NULL),
+(16, 3, 'reg', 120000, 'paid', '2026-06-23 09:15:12', 0.00, 0.00, NULL),
+(17, 4, 'adh', 76000, 'ready', '2026-06-23 09:21:00', 0.00, 0.00, NULL),
+(18, 6, 'Egy', 16000, 'pending', '2026-06-25 03:43:18', 0.00, 0.00, 'ga pake es');
 
 --
 -- Triggers `orders`
@@ -308,7 +292,16 @@ INSERT INTO `order_items` (`id`, `order_id`, `menu_id`, `quantity`, `price`) VAL
 (47, 14, 7, 1, 18000),
 (48, 14, 12, 1, 22000),
 (49, 14, 17, 1, 20000),
-(50, 14, 19, 1, 22000);
+(50, 14, 19, 1, 22000),
+(51, 15, 1, 1, 25000),
+(52, 15, 4, 1, 8000),
+(53, 15, 25, 1, 15000),
+(54, 16, 1, 1, 25000),
+(55, 16, 5, 1, 15000),
+(56, 16, 8, 1, 20000),
+(57, 17, 8, 1, 20000),
+(58, 17, 7, 1, 18000),
+(59, 18, 4, 1, 8000);
 
 --
 -- Triggers `order_items`
@@ -344,9 +337,9 @@ INSERT INTO `restaurant_tables` (`id`, `table_number`, `status`, `customer_name`
 (1, 'Meja 01', 'empty', '', NULL),
 (2, 'Meja 02', 'empty', '', NULL),
 (3, 'Meja 03', 'empty', '', NULL),
-(4, 'Meja 04', 'ready', 'Adhia', '14:29:00'),
+(4, 'Meja 04', 'ready', 'adh', '09:21:00'),
 (5, 'Meja 05', 'empty', '', NULL),
-(6, 'Meja 06', 'empty', '', NULL),
+(6, 'Meja 06', 'occupied', 'Egy', '03:43:18'),
 (7, 'Meja 07', 'empty', '', NULL),
 (8, 'Meja 08', 'empty', '', NULL),
 (9, 'Meja 09', 'occupied', 'Cecep', '05:52:32'),
@@ -385,7 +378,7 @@ CREATE TABLE `users` (
 INSERT INTO `users` (`id`, `username`, `password`, `role`, `created_at`, `updated_at`) VALUES
 (1, 'pelayan', '$2y$10$wrNh47kbS6CavrdnHmMLeug7.utxyQcrrJqjQFkmcDPj4Pe7E7mey', 'waiter', '2026-06-06 01:13:16', '2026-06-06 01:13:16'),
 (2, 'dapur', '$2y$10$wrNh47kbS6CavrdnHmMLeug7.utxyQcrrJqjQFkmcDPj4Pe7E7mey', 'kitchen', '2026-06-06 01:13:16', '2026-06-06 01:13:16'),
-(3, 'kasir', '$2y$10$wrNh47kbS6CavrdnHmMLeug7.utxyQcrrJqjQFkmcDPj4Pe7E7mey', 'cashier', '2026-06-06 01:13:16', '2026-06-06 01:13:16'),
+(3, 'kasir', '$2y$10$wrNh47kbS6CavrdnHmMLeug7.utxyQcrrJqjQFkmcDPj4Pe7E7mey', 'cashier', '2026-06-06 01:13:16', '2026-06-25 03:54:08'),
 (4, 'admin', '$2y$10$wrNh47kbS6CavrdnHmMLeug7.utxyQcrrJqjQFkmcDPj4Pe7E7mey', 'admin', '2026-06-06 01:13:16', '2026-06-06 01:13:16');
 
 -- --------------------------------------------------------
@@ -455,6 +448,13 @@ CREATE TABLE `vw_kitchen_queue` (
 --
 
 --
+-- Indexes for table `discount_codes`
+--
+ALTER TABLE `discount_codes`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `code` (`code`);
+
+--
 -- Indexes for table `log_harga_menu`
 --
 ALTER TABLE `log_harga_menu`
@@ -500,6 +500,12 @@ ALTER TABLE `users`
 --
 
 --
+-- AUTO_INCREMENT for table `discount_codes`
+--
+ALTER TABLE `discount_codes`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+
+--
 -- AUTO_INCREMENT for table `log_harga_menu`
 --
 ALTER TABLE `log_harga_menu`
@@ -509,25 +515,25 @@ ALTER TABLE `log_harga_menu`
 -- AUTO_INCREMENT for table `menu_items`
 --
 ALTER TABLE `menu_items`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=60;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=62;
 
 --
 -- AUTO_INCREMENT for table `orders`
 --
 ALTER TABLE `orders`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
 
 --
 -- AUTO_INCREMENT for table `order_items`
 --
 ALTER TABLE `order_items`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=51;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=60;
 
 --
 -- AUTO_INCREMENT for table `restaurant_tables`
 --
 ALTER TABLE `restaurant_tables`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
 
 --
 -- AUTO_INCREMENT for table `users`

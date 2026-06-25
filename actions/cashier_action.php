@@ -41,19 +41,14 @@ function handleCashierRequest(PDO $conn): array {
             exit;
         }
 
-        // Simple discount codes: DISKON10 (10%), DISKON15 (15%), DISKON20 (20%)
-        $discounts = [
-            'DISKON10' => 10,
-            'DISKON15' => 15,
-            'DISKON20' => 20,
-            'HARBOLNAS' => 25,
-            'PROMO50' => 50
-        ];
+        $stmt = $conn->prepare("SELECT discount_percent FROM discount_codes WHERE code = ? AND is_active = 1");
+        $stmt->execute([$code]);
+        $discount = $stmt->fetchColumn();
 
-        if (isset($discounts[$code])) {
-            echo json_encode(['valid' => true, 'discount_percent' => $discounts[$code]]);
+        if ($discount !== false) {
+            echo json_encode(['valid' => true, 'discount_percent' => $discount]);
         } else {
-            echo json_encode(['valid' => false, 'message' => 'Kode diskon tidak valid']);
+            echo json_encode(['valid' => false, 'message' => 'Kode diskon tidak valid atau tidak aktif']);
         }
         exit;
     }

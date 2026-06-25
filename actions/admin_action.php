@@ -20,6 +20,13 @@ function handleAdminRequest(PDO $conn): array {
                 header("Location: admin.php?tab=menu&msg=Harga harus lebih dari 0!&type=error");
                 exit;
             }
+            // Check duplicate menu name
+            $stmtCheck = $conn->prepare("SELECT COUNT(*) FROM menu_items WHERE LOWER(name) = LOWER(?)");
+            $stmtCheck->execute([$name]);
+            if ($stmtCheck->fetchColumn() > 0) {
+                header("Location: admin.php?tab=menu&msg=Nama menu sudah ada! Gunakan nama berbeda.&type=error");
+                exit;
+            }
             $sts  = $_POST['status'];
             $dsc  = trim($_POST['description']);
             $img  = !empty($_POST['image']) ? trim($_POST['image']) : 'https://picsum.photos/300/200?random=food';
@@ -37,6 +44,13 @@ function handleAdminRequest(PDO $conn): array {
             $prc  = intval($_POST['price']);
             if ($prc <= 0) {
                 header("Location: admin.php?tab=menu&msg=Harga harus lebih dari 0!&type=error");
+                exit;
+            }
+            // Check duplicate menu name (exclude current item)
+            $stmtCheck = $conn->prepare("SELECT COUNT(*) FROM menu_items WHERE LOWER(name) = LOWER(?) AND id != ?");
+            $stmtCheck->execute([$name, $id]);
+            if ($stmtCheck->fetchColumn() > 0) {
+                header("Location: admin.php?tab=menu&msg=Nama menu sudah ada! Gunakan nama berbeda.&type=error");
                 exit;
             }
             $sts  = $_POST['status'];
@@ -86,6 +100,64 @@ function handleAdminRequest(PDO $conn): array {
             }
             exit;
         }
+    }
+
+    // --- DISCOUNT CODE MANAGEMENT ---
+    if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_GET['action'])) {
+        if ($_GET['action'] === 'add_discount') {
+            $code = strtoupper(trim($_POST['code']));
+            $discount_percent = floatval($_POST['discount_percent']);
+            if (empty($code) || $discount_percent <= 0 || $discount_percent > 100) {
+                header("Location: admin.php?tab=diskon&msg=Data diskon tidak valid!&type=error");
+                exit;
+            }
+            try {
+                $stmt = $conn->prepare("INSERT INTO discount_codes (code, discount_percent) VALUES (?, ?)");
+                $stmt->execute([$code, $discount_percent]);
+                header("Location: admin.php?tab=diskon&msg=Kode diskon berhasil ditambahkan!");
+            } catch (Exception $e) {
+                header("Location: admin.php?tab=diskon&msg=Kode diskon sudah ada!&type=error");
+            }
+            exit;
+        }
+
+        if ($_GET['action'] === 'edit_discount') {
+            $id = intval($_POST['id']);
+            $code = strtoupper(trim($_POST['code']));
+            $discount_percent = floatval($_POST['discount_percent']);
+            $is_active = isset($_POST['is_active']) ? 1 : 0;
+            if (empty($code) || $discount_percent <= 0 || $discount_percent > 100) {
+                header("Location: admin.php?tab=diskon&msg=Data diskon tidak valid!&type=error");
+                exit;
+            }
+            try {
+                $stmt = $conn->prepare("UPDATE discount_codes SET code = ?, discount_percent = ?, is_active = ? WHERE id = ?");
+                $stmt->execute([$code, $discount_percent, $is_active, $id]);
+                header("Location: admin.php?tab=diskon&msg=Kode diskon berhasil diperbarui!");
+            } catch (Exception $e) {
+                header("Location: admin.php?tab=diskon&msg=Kode diskon sudah ada!&type=error");
+            }
+            exit;
+        }
+
+        if ($_GET['action'] === 'delete_discount' && isset($_POST['id'])) {
+            $id = intval($_POST['id']);
+            $stmt = $conn->prepare("DELETE FROM discount_codes WHERE id = ?");
+            $stmt->execute([$id]);
+            header("Location: admin.php?tab=diskon&msg=Kode diskon berhasil dihapus!");
+            exit;
+        }
+    }
+
+    // Get discount code for edit modal
+    if (isset($_GET['action']) && $_GET['action'] === 'get_discount' && isset($_GET['id'])) {
+        header('Content-Type: application/json');
+        $id = intval($_GET['id']);
+        $stmt = $conn->prepare("SELECT * FROM discount_codes WHERE id = ?");
+        $stmt->execute([$id]);
+        $discount = $stmt->fetch(PDO::FETCH_ASSOC);
+        echo json_encode($discount ? $discount : ['error' => 'Diskon tidak ditemukan']);
+        exit;
     }
 
     // Handle analytics data request
@@ -224,5 +296,15 @@ function handleAdminRequest(PDO $conn): array {
         'menus'       => $conn->query("SELECT * FROM menu_items ORDER BY id DESC")->fetchAll(PDO::FETCH_ASSOC),
         'tables'      => $conn->query("SELECT * FROM restaurant_tables ORDER BY table_number ASC")->fetchAll(PDO::FETCH_ASSOC),
         'users'       => $conn->query("SELECT id, username, role, created_at FROM users ORDER BY created_at DESC")->fetchAll(PDO::FETCH_ASSOC),
+        'discountCodes' => $conn->query("SELECT * FROM discount_codes ORDER BY id ASC")->fetchAll(PDO::FETCH_ASSOC),
+        'transactions'  => $conn->query("
+            SELECT o.id, o.customer_name, t.table_number, o.total_amount, o.tip_amount, o.discount_percent, o.status, o.created_at,
+                   (SELECT GROUP_CONCAT(CONCAT(oi.quantity, 'x ', mi.name) SEPARATOR ', ') FROM order_items oi JOIN menu_items mi ON oi.menu_id = mi.id WHERE oi.order_id = o.id) as items_summary
+            FROM orders o
+            JOIN restaurant_tables t ON o.table_id = t.id
+            WHERE o.status = 'paid'
+            ORDER BY o.created_at DESC
+            LIMIT 50
+        ")->fetchAll(PDO::FETCH_ASSOC),
     ];
 }
