@@ -126,7 +126,7 @@ Lihat kumpulan screenshot seluruh modul aplikasi di [`preview.md`](preview.md).
 
 ```bash
 # Clone via Git
-git clone https://github.com/regieadhiar/TB-PraktikumBasisData.git
+git clone https://github.com/regieadhiar/restomaju.git
 
 # ATAU download ZIP dan extract
 ```
