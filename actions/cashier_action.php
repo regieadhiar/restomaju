@@ -10,7 +10,7 @@ function handleCashierRequest(PDO $conn): array {
         $order = $stmtOrder->fetch(PDO::FETCH_ASSOC);
 
         if ($order) {
-            $tableQuery = $conn->prepare("SELECT table_number, order_time FROM restaurant_tables WHERE id = ?");
+            $tableQuery = $conn->prepare("SELECT table_number FROM restaurant_tables WHERE id = ?");
             $tableQuery->execute([$tid]);
             $tableInfo = $tableQuery->fetch(PDO::FETCH_ASSOC);
 
@@ -21,7 +21,7 @@ function handleCashierRequest(PDO $conn): array {
             echo json_encode([
                 'table_number' => $tableInfo['table_number'],
                 'customer_name'=> $order['customer_name'],
-                'order_time'   => $tableInfo['order_time'],
+                'order_time'   => date('H:i:s', strtotime($order['created_at'])),
                 'total_amount' => $order['total_amount'],
                 'items'        => $items
             ]);
@@ -64,7 +64,7 @@ function handleCashierRequest(PDO $conn): array {
             $updOrder = $conn->prepare("UPDATE orders SET status = 'paid', tip_amount = ?, discount_percent = ? WHERE table_id = ? AND status = 'ready'");
             $updOrder->execute([$tip, $discount_percent, $table_id]);
 
-            $updTable = $conn->prepare("UPDATE restaurant_tables SET status = 'empty', customer_name = '', order_time = NULL WHERE id = ?");
+            $updTable = $conn->prepare("UPDATE restaurant_tables SET status = 'empty' WHERE id = ?");
             $updTable->execute([$table_id]);
 
             $conn->commit();

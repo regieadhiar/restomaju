@@ -67,8 +67,7 @@ CREATE TABLE `log_harga_menu` (
 -- Dumping data for table `log_harga_menu`
 --
 
-INSERT INTO `log_harga_menu` (`log_id`, `menu_id`, `harga_lama`, `harga_baru`, `waktu_perubahan`) VALUES
-(1, 59, 1, 90, '2026-06-23 12:46:47');
+-- Orphaned data removed to satisfy foreign key constraints
 
 -- --------------------------------------------------------
 
@@ -172,6 +171,7 @@ CREATE TABLE `orders` (
   `status` enum('pending','ready','paid') DEFAULT 'pending',
   `created_at` timestamp NULL DEFAULT current_timestamp(),
   `tip_amount` decimal(10,2) DEFAULT 0.00,
+  `discount_code_id` int(11) DEFAULT NULL,
   `discount_percent` decimal(5,2) DEFAULT 0.00,
   `notes` text DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -205,10 +205,8 @@ INSERT INTO `orders` (`id`, `table_id`, `customer_name`, `total_amount`, `status
 DELIMITER $$
 CREATE TRIGGER `tg_after_order_paid` AFTER UPDATE ON `orders` FOR EACH ROW BEGIN
     IF NEW.status = 'paid' AND OLD.status != 'paid' THEN
-        UPDATE restaurant_tables 
-        SET status = 'empty', 
-            customer_name = NULL, 
-            order_time = NULL
+        UPDATE restaurant_tables
+        SET status = 'empty'
         WHERE id = NEW.table_id;
     END IF;
 END
@@ -216,10 +214,8 @@ $$
 DELIMITER ;
 DELIMITER $$
 CREATE TRIGGER `tg_after_order_placed` AFTER INSERT ON `orders` FOR EACH ROW BEGIN
-    UPDATE restaurant_tables 
-    SET status = 'occupied', 
-        customer_name = NEW.customer_name, 
-        order_time = CURRENT_TIME()
+    UPDATE restaurant_tables
+    SET status = 'occupied'
     WHERE id = NEW.table_id;
 END
 $$
@@ -324,37 +320,35 @@ DELIMITER ;
 CREATE TABLE `restaurant_tables` (
   `id` int(11) NOT NULL,
   `table_number` varchar(10) NOT NULL,
-  `status` enum('empty','occupied','ready') DEFAULT 'empty',
-  `customer_name` varchar(100) DEFAULT '',
-  `order_time` time DEFAULT NULL
+  `status` enum('empty','occupied','ready') DEFAULT 'empty'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `restaurant_tables`
 --
 
-INSERT INTO `restaurant_tables` (`id`, `table_number`, `status`, `customer_name`, `order_time`) VALUES
-(1, 'Meja 01', 'empty', '', NULL),
-(2, 'Meja 02', 'empty', '', NULL),
-(3, 'Meja 03', 'empty', '', NULL),
-(4, 'Meja 04', 'ready', 'adh', '09:21:00'),
-(5, 'Meja 05', 'empty', '', NULL),
-(6, 'Meja 06', 'occupied', 'Egy', '03:43:18'),
-(7, 'Meja 07', 'empty', '', NULL),
-(8, 'Meja 08', 'empty', '', NULL),
-(9, 'Meja 09', 'occupied', 'Cecep', '05:52:32'),
-(10, 'Meja 10', 'empty', '', NULL),
-(11, 'Meja 11', 'empty', '', NULL),
-(12, 'Meja 12', 'empty', '', NULL),
-(13, 'Meja 13', 'empty', '', NULL),
-(14, 'Meja 14', 'empty', '', NULL),
-(15, 'Meja 15', 'empty', '', NULL),
-(16, 'Meja 16', 'empty', '', NULL),
-(17, 'Meja 17', 'empty', '', NULL),
-(18, 'Meja 18', 'empty', '', NULL),
-(19, 'Meja 19', 'empty', '', NULL),
-(20, 'Meja 20', 'empty', '', NULL),
-(21, 'Meja 21', 'empty', '', NULL);
+INSERT INTO `restaurant_tables` (`id`, `table_number`, `status`) VALUES
+(1, 'Meja 01', 'empty'),
+(2, 'Meja 02', 'empty'),
+(3, 'Meja 03', 'empty'),
+(4, 'Meja 04', 'ready'),
+(5, 'Meja 05', 'empty'),
+(6, 'Meja 06', 'occupied'),
+(7, 'Meja 07', 'empty'),
+(8, 'Meja 08', 'empty'),
+(9, 'Meja 09', 'occupied'),
+(10, 'Meja 10', 'empty'),
+(11, 'Meja 11', 'empty'),
+(12, 'Meja 12', 'empty'),
+(13, 'Meja 13', 'empty'),
+(14, 'Meja 14', 'empty'),
+(15, 'Meja 15', 'empty'),
+(16, 'Meja 16', 'empty'),
+(17, 'Meja 17', 'empty'),
+(18, 'Meja 18', 'empty'),
+(19, 'Meja 19', 'empty'),
+(20, 'Meja 20', 'empty'),
+(21, 'Meja 21', 'empty');
 
 -- --------------------------------------------------------
 
@@ -582,10 +576,24 @@ CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW 
 --
 
 --
+-- Constraints for table `log_harga_menu`
+--
+ALTER TABLE `log_harga_menu`
+  ADD CONSTRAINT `fk_log_menu` FOREIGN KEY (`menu_id`) REFERENCES `menu_items` (`id`) ON DELETE CASCADE;
+
+--
 -- Constraints for table `orders`
 --
 ALTER TABLE `orders`
-  ADD CONSTRAINT `1` FOREIGN KEY (`table_id`) REFERENCES `restaurant_tables` (`id`) ON DELETE SET NULL;
+  ADD CONSTRAINT `fk_order_table` FOREIGN KEY (`table_id`) REFERENCES `restaurant_tables` (`id`) ON DELETE SET NULL,
+  ADD CONSTRAINT `fk_order_discount` FOREIGN KEY (`discount_code_id`) REFERENCES `discount_codes` (`id`) ON DELETE SET NULL;
+
+--
+-- Constraints for table `order_items`
+--
+ALTER TABLE `order_items`
+  ADD CONSTRAINT `fk_item_order` FOREIGN KEY (`order_id`) REFERENCES `orders` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `fk_item_menu` FOREIGN KEY (`menu_id`) REFERENCES `menu_items` (`id`) ON DELETE CASCADE;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

@@ -151,7 +151,7 @@ $recentMenus = array_slice($recentMenus, 0, 5);
                                             <th class="pb-2 text-right">Total</th>
                                             <th class="pb-2 text-right">Diskon</th>
                                             <th class="pb-2 text-right">Tip</th>
-                                            <th class="pb-2">Waktu</th>
+                                            <th class="pb-2 text-center">Waktu</th>
                                         </tr>
                                     </thead>
                                     <tbody class="text-slate-600 divide-y divide-slate-100">
@@ -164,7 +164,7 @@ $recentMenus = array_slice($recentMenus, 0, 5);
                                                 <td class="py-2 text-right font-bold text-slate-800">Rp <?= number_format($tx['total_amount'], 0, ',', '.') ?></td>
                                                 <td class="py-2 text-right <?= $tx['discount_percent'] > 0 ? 'text-red-500 font-semibold' : 'text-slate-400' ?>"><?= $tx['discount_percent'] > 0 ? $tx['discount_percent'].'%' : '-' ?></td>
                                                 <td class="py-2 text-right <?= $tx['tip_amount'] > 0 ? 'text-green-600 font-semibold' : 'text-slate-400' ?>"><?= $tx['tip_amount'] > 0 ? 'Rp '.number_format($tx['tip_amount'],0,',','.') : '-' ?></td>
-                                                <td class="py-2 text-xs text-slate-400"><?= date('d M H:i', strtotime($tx['created_at'])) ?></td>
+                                                <td class="py-2 text-center text-xs text-slate-400"><?= date('d M H:i', strtotime($tx['created_at'])) ?></td>
                                             </tr>
                                         <?php endforeach; ?>
                                     </tbody>

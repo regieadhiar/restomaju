@@ -28,9 +28,8 @@ function handleWaiterRequest(PDO $conn): array {
                 $stmtItem->execute([$order_id, $item['id'], $item['qty'], $item['price']]);
             }
 
-            $time_now = date('H:i:s');
-            $stmtTable = $conn->prepare("UPDATE restaurant_tables SET status = 'occupied', customer_name = ?, order_time = ? WHERE id = ?");
-            $stmtTable->execute([$input['customer_name'], $time_now, $input['table_id']]);
+            $stmtTable = $conn->prepare("UPDATE restaurant_tables SET status = 'occupied' WHERE id = ?");
+            $stmtTable->execute([$input['table_id']]);
 
             $conn->commit();
             echo json_encode(['status' => 'success', 'message' => 'Pesanan berhasil dikirim ke dapur!']);
