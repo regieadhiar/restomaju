@@ -2,7 +2,7 @@
 
 Aplikasi pemesanan restoran berbasis **PHP Native** dan **MariaDB** dengan antarmuka modern menggunakan **Tailwind CSS**. Sistem modular mendukung login multi-role, manajemen menu, alur pesanan real-time, dan pembayaran kasir.
 
-[![Production](https://img.shields.io/badge/Production-Official%20Site-blue?style=for-the-badge&logo=php&logoColor=white)](https://resto.egyadya.site)
+[![Demo](https://img.shields.io/badge/Demo-Live%20Web-amber?style=for-the-badge&logo=google-chrome&logoColor=white)](https://resto.egyadya.site)
 
 ---
 
