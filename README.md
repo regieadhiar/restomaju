@@ -22,7 +22,7 @@ Aplikasi pemesanan restoran berbasis **PHP Native** dan **MariaDB** dengan antar
 Aplikasi memiliki empat role utama dengan hak akses terpisah:
 
 ### 1. Admin
-- Dashboard operasional: ringkasan pendapatan harian, transaksi, menu aktif, meja terisi
+- Dashboard operasional: ringkasan pendapatan harian, transaksi, menu aktif, meja terisi, histori pemesanan
 - Manajemen menu: tambah, edit, detail, hapus
 - Manajemen meja: tambah meja baru, hapus meja kosong
 - Tab analitik: grafik pendapatan, pesanan, kategori penjualan, menu terlaris
@@ -31,7 +31,7 @@ Aplikasi memiliki empat role utama dengan hak akses terpisah:
 ### 2. Pelayan
 - Pilih meja kosong, masukkan nama pelanggan
 - Tampilkan menu dengan filter kategori: Semua, Makanan, Minuman, Cemilan
-- Keranjang pesanan interaktif: tambah item, ubah jumlah, lihat total
+- Keranjang pesanan interaktif: tambah item, ubah jumlah, lihat total, tambah catatan
 - Kirim pesanan ke dapur dengan satu klik
 
 ### 3. Dapur
@@ -39,6 +39,7 @@ Aplikasi memiliki empat role utama dengan hak akses terpisah:
 - Detail meja dan item pesanan
 - Tombol tandai pesanan **Siap Saji**
 - Jam digital untuk tracking waktu layanan
+- Fitur ketersediaan menu
 
 ### 4. Kasir
 - Status meja: kosong, memasak, siap bayar
