@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jun 25, 2026 at 03:54 AM
+-- Generation Time: Jul 13, 2026 at 12:45 AM
 -- Server version: 12.2.2-MariaDB-log
 -- PHP Version: 8.2.31
 
@@ -20,8 +20,6 @@ SET time_zone = "+00:00";
 --
 -- Database: `restomaju_db`
 --
-CREATE DATABASE IF NOT EXISTS `restomaju_db` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
-USE `restomaju_db`;
 
 -- --------------------------------------------------------
 
@@ -62,12 +60,6 @@ CREATE TABLE `log_harga_menu` (
   `harga_baru` int(11) DEFAULT NULL,
   `waktu_perubahan` datetime DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
---
--- Dumping data for table `log_harga_menu`
---
-
--- Orphaned data removed to satisfy foreign key constraints
 
 -- --------------------------------------------------------
 
@@ -180,24 +172,24 @@ CREATE TABLE `orders` (
 -- Dumping data for table `orders`
 --
 
-INSERT INTO `orders` (`id`, `table_id`, `customer_name`, `total_amount`, `status`, `created_at`, `tip_amount`, `discount_percent`, `notes`) VALUES
-(1, 5, 'if', 25000, 'paid', '2026-06-02 01:34:43', 0.00, 0.00, NULL),
-(3, 6, 'ba', 93000, 'paid', '2026-06-04 09:04:37', 0.00, 0.00, NULL),
-(4, 7, 'me', 30000, 'paid', '2026-06-06 00:56:57', 0.00, 0.00, NULL),
-(5, 6, 'aku', 237000, 'paid', '2026-06-06 01:26:36', 10000.00, 10.00, NULL),
-(6, 11, 'dia', 25000, 'paid', '2026-06-06 01:31:36', 5000.00, 50.00, NULL),
-(7, 18, 'Diriku', 120000, 'paid', '2026-06-06 01:36:15', 10000.00, 10.00, NULL),
-(8, 9, 'Budi', 50000, 'paid', '2026-06-06 07:50:22', 5000.00, 10.00, NULL),
-(9, 15, 'Regie', 75000, 'paid', '2026-06-09 07:17:21', 0.00, 0.00, NULL),
-(10, 6, 'mamat', 700000, 'paid', '2026-06-09 08:58:30', 10000.00, 10.00, NULL),
-(11, 14, 'Mimi', 88000, 'paid', '2026-06-10 05:05:15', 0.00, 0.00, NULL),
-(12, 3, 'Regie', 35000, 'paid', '2026-06-11 09:03:14', 0.00, 0.00, NULL),
-(13, 4, 'Adhia', 78000, 'paid', '2026-06-12 14:29:00', 0.00, 0.00, NULL),
-(14, 9, 'Cecep', 384000, 'pending', '2026-06-23 05:52:32', 0.00, 0.00, NULL),
-(15, 14, 'Rafli', 96000, 'paid', '2026-06-23 08:57:51', 10000.00, 10.00, NULL),
-(16, 3, 'reg', 120000, 'paid', '2026-06-23 09:15:12', 0.00, 0.00, NULL),
-(17, 4, 'adh', 76000, 'ready', '2026-06-23 09:21:00', 0.00, 0.00, NULL),
-(18, 6, 'Egy', 16000, 'pending', '2026-06-25 03:43:18', 0.00, 0.00, 'ga pake es');
+INSERT INTO `orders` (`id`, `table_id`, `customer_name`, `total_amount`, `status`, `created_at`, `tip_amount`, `discount_code_id`, `discount_percent`, `notes`) VALUES
+(1, 5, 'if', 25000, 'paid', '2026-06-02 01:34:43', 0.00, NULL, 0.00, NULL),
+(3, 6, 'ba', 93000, 'paid', '2026-06-04 09:04:37', 0.00, NULL, 0.00, NULL),
+(4, 7, 'me', 30000, 'paid', '2026-06-06 00:56:57', 0.00, NULL, 0.00, NULL),
+(5, 6, 'aku', 237000, 'paid', '2026-06-06 01:26:36', 10000.00, NULL, 10.00, NULL),
+(6, 11, 'dia', 25000, 'paid', '2026-06-06 01:31:36', 5000.00, NULL, 50.00, NULL),
+(7, 18, 'Diriku', 120000, 'paid', '2026-06-06 01:36:15', 10000.00, NULL, 10.00, NULL),
+(8, 9, 'Budi', 50000, 'paid', '2026-06-06 07:50:22', 5000.00, NULL, 10.00, NULL),
+(9, 15, 'Regie', 75000, 'paid', '2026-06-09 07:17:21', 0.00, NULL, 0.00, NULL),
+(10, 6, 'mamat', 700000, 'paid', '2026-06-09 08:58:30', 10000.00, NULL, 10.00, NULL),
+(11, 14, 'Mimi', 88000, 'paid', '2026-06-10 05:05:15', 0.00, NULL, 0.00, NULL),
+(12, 3, 'Regie', 35000, 'paid', '2026-06-11 09:03:14', 0.00, NULL, 0.00, NULL),
+(13, 4, 'Adhia', 78000, 'paid', '2026-06-12 14:29:00', 0.00, NULL, 0.00, NULL),
+(14, 9, 'Cecep', 384000, 'pending', '2026-06-23 05:52:32', 0.00, NULL, 0.00, NULL),
+(15, 14, 'Rafli', 96000, 'paid', '2026-06-23 08:57:51', 10000.00, NULL, 10.00, NULL),
+(16, 3, 'reg', 120000, 'paid', '2026-06-23 09:15:12', 0.00, NULL, 0.00, NULL),
+(17, 4, 'adh', 76000, 'ready', '2026-06-23 09:21:00', 0.00, NULL, 0.00, NULL),
+(18, 6, 'Egy', 16000, 'pending', '2026-06-25 03:43:18', 0.00, NULL, 0.00, 'ga pake es');
 
 --
 -- Triggers `orders`
@@ -452,7 +444,8 @@ ALTER TABLE `discount_codes`
 -- Indexes for table `log_harga_menu`
 --
 ALTER TABLE `log_harga_menu`
-  ADD PRIMARY KEY (`log_id`);
+  ADD PRIMARY KEY (`log_id`),
+  ADD KEY `fk_log_menu` (`menu_id`);
 
 --
 -- Indexes for table `menu_items`
@@ -465,7 +458,8 @@ ALTER TABLE `menu_items`
 --
 ALTER TABLE `orders`
   ADD PRIMARY KEY (`id`),
-  ADD KEY `table_id` (`table_id`);
+  ADD KEY `table_id` (`table_id`),
+  ADD KEY `fk_order_discount` (`discount_code_id`);
 
 --
 -- Indexes for table `order_items`
@@ -585,15 +579,15 @@ ALTER TABLE `log_harga_menu`
 -- Constraints for table `orders`
 --
 ALTER TABLE `orders`
-  ADD CONSTRAINT `fk_order_table` FOREIGN KEY (`table_id`) REFERENCES `restaurant_tables` (`id`) ON DELETE SET NULL,
-  ADD CONSTRAINT `fk_order_discount` FOREIGN KEY (`discount_code_id`) REFERENCES `discount_codes` (`id`) ON DELETE SET NULL;
+  ADD CONSTRAINT `fk_order_discount` FOREIGN KEY (`discount_code_id`) REFERENCES `discount_codes` (`id`) ON DELETE SET NULL,
+  ADD CONSTRAINT `fk_order_table` FOREIGN KEY (`table_id`) REFERENCES `restaurant_tables` (`id`) ON DELETE SET NULL;
 
 --
 -- Constraints for table `order_items`
 --
 ALTER TABLE `order_items`
-  ADD CONSTRAINT `fk_item_order` FOREIGN KEY (`order_id`) REFERENCES `orders` (`id`) ON DELETE CASCADE,
-  ADD CONSTRAINT `fk_item_menu` FOREIGN KEY (`menu_id`) REFERENCES `menu_items` (`id`) ON DELETE CASCADE;
+  ADD CONSTRAINT `fk_item_menu` FOREIGN KEY (`menu_id`) REFERENCES `menu_items` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `fk_item_order` FOREIGN KEY (`order_id`) REFERENCES `orders` (`id`) ON DELETE CASCADE;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
